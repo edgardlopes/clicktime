@@ -1,0 +1,90 @@
+/*html{
+    height: 100%;
+}*/
+
+.centered {
+    margin: 0 auto !important;
+    float: none !important;
+}
+
+body{
+    margin-top: 60px;
+    /*background: #ecf0f1;*/
+}
+
+.jumbotron{
+    background-color: #bdc3c7;
+}
+
+.panel img{
+    width: 150px;
+}
+
+.panel-body *{
+    /*margin-top: 20px;*/
+}            
+
+.panel p{
+    text-align: center;
+}
+
+.panel{
+    padding: 0px;
+}
+
+.panel-heading{
+    border-radius: 0;
+}
+
+.clear{
+    clear: both;
+}
+
+.row-wrap{
+    display: -webkit-box;           /* OLD - iOS 6-, Safari 3.1-6 */
+    display: -moz-box;              /* OLD - Firefox 19- (doesn't work very well) */
+    display: -ms-flexbox;           /* TWEENER - IE 10 */
+    display: -webkit-flex;          /* NEW - Chrome */
+    display: flex;                  /* NEW, Spec - Opera 12.1, Firefox 20+ */
+}
+
+
+
+@media(max-width: 1015px){
+    .solicitacoes-recentes{
+
+    }
+
+
+    .row-wrap{
+        display: inline-block;   
+    }
+}
+
+
+.page-content-sidebar{
+    margin-top: 10px;
+}
+
+.capitalize{
+    text-transform:capitalize;
+}
+
+.myInvisible{
+    display: none;
+}
+/*.solicitacao{
+    border: #aaa solid 3px;
+    border-radius: 5px;
+    padding-bottom: 10px;
+}*/
+
+footer .footer-below {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    z-index: -1;
+    padding: 25px 0;
+    background-color: #2C3E50;
+}

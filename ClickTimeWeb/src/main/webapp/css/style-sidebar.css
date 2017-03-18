@@ -1,0 +1,98 @@
+#sidebar{
+    background: #2C3E50;
+    padding: 5px 0px;
+    position: absolute;
+    top:60px;
+    bottom: 0px;
+    
+    overflow: auto;
+}
+
+.close-wrapper{
+    display: none;
+}
+
+#sidebar .glyphicon{
+    margin-right: 10px;
+}
+@media(min-width: 767px){
+    #sidebar{
+        position: fixed;
+    }
+    
+    .toggle-sidebar{
+        display: none;
+    }
+    .page-content-sidebar{
+        float: right;
+    }
+}
+
+@media(max-width: 767px){
+    #sidebar{
+        display: none;
+    }
+
+    .toggle-sidebar{
+        display: block;
+        position: fixed;
+        right: 15px;
+        bottom: 15px;
+        z-index: 3;
+    }
+
+    .close{
+        margin-right: 10px;
+    }
+
+    .close-wrapper{
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .sidebar-toggled{
+        display: block !important;
+        position: fixed !important;
+        width: 90%;
+        z-index: 2;
+        top: 60px !important;
+        bottom: 0px!important;
+        /*        top: 10px;
+        left: 10px;*/
+    }
+}
+
+@media(min-width: 360px) and (max-width: 767px){
+    #sidebar{
+        width: 324px;
+    }
+}
+
+.page-content{
+    padding-left: 0;
+}
+
+@media(max-width: 767px){
+    .page-content-sidebar{
+        padding: 20px 10px;
+    }
+
+    .page-content-sidebar > div{
+        padding: 0;
+    }
+
+}
+
+.nav-stacked a{
+    color: #E8E8E8;
+}
+.nav>li>a:hover, 
+.nav>li>a:focus {
+    background-color: #969696;
+}
+
+@media(min-width: 767px){
+    .toggle-sidebar{
+        display: none !important;
+    }
+}

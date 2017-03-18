@@ -1,0 +1,138 @@
+.horario-info{
+    display: inline-block;
+}
+
+.horario{
+    height: 40px;
+}
+
+.aguardando-resposta{
+    background: #E87E04;
+}
+
+.menu{
+    /*background: #a2a2a2;*/
+    border-radius: 5px;
+    margin-left: 15px;
+    padding-left: 10px;
+}
+
+.menu-wrapper{
+    background: #aaa;
+    border-radius: 5px;
+    border: #000 solid 3px;
+}
+
+.content-wrapper{
+    border: 3px #000 solid;
+    border-radius: 3px;
+}
+
+.menu-horario-reservados-wrapper{
+    display: inline-block !important;
+}
+
+.panel.dropdown-menu{
+    margin-top: 0;
+}
+
+
+.horario{
+    position: relative;
+    margin-bottom: 1px;
+}
+
+
+.info-horario{
+    position: absolute;
+    top: 1px;
+    right: 5px;
+}
+.info-horario-ar{
+    position: absolute;
+    top: 1px;
+    right: 5px;
+}
+
+.toggle-controles{
+    display: none;
+}
+
+.myClose{
+    display: none;
+}
+
+.dropdown-menu{
+    border-color: #bbb;
+}
+
+@media(max-width: 600px){
+    .controles-wrapper{
+        display: none;
+        position: fixed;
+        top: 75px;
+        right: 15px;
+        left: 15px;
+    }
+
+    .toggle-controles{
+        display: block;
+        position: fixed;
+        right: 15px;
+        bottom: 80px;
+    }
+
+    .myClose{
+        display: block;
+        position: absolute;
+        right: 10px;
+        top: 5px;
+    }
+
+
+}
+
+.dropdown-menu{
+    top: 0;
+    left: auto;
+    right: 40px;
+}
+@media(min-width: 600px){
+    .controles-wrapper{
+        display: block !important;
+    }
+}
+
+/*@media(max-width: 640px) and (min-width: 601px){*/
+@media (min-width: 601px){
+    .horarios-wrapper{
+        width: 47%;
+    }
+
+    .horario-controle-content
+    {
+        position: relative;
+    }
+
+    .controles-wrapper{
+        position: absolute; 
+        width: 47%;
+        right: 15px;
+        top: 15px;
+    }
+}
+
+.btn-block+.btn-block{
+    margin-top: 0px;
+}
+
+.controles-wrapper .btn-block{
+    margin-top: 2px;
+}
+
+.info-horario .panel-body p{
+    color: #000;
+}
+.info-horario-ar .panel-body p{
+    color: #000;
+}

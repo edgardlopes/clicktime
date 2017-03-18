@@ -1,0 +1,15 @@
+.form-group.col-lg-4 {
+  padding: 2px;
+}
+
+.filtro-form{
+    margin-bottom: 20px;
+}
+
+@media(max-width: 1200px){
+    .filtro-form{
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+        border-bottom: #aaa solid 1px;
+    }
+}

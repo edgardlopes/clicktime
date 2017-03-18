@@ -1,0 +1,136 @@
+/*            html{
+                height: 100%;
+            }*/
+.calendar-wrapper{
+    position: relative;
+    margin-right: 0;
+}
+.opcoes{
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    padding: 5px !important;
+    margin: 5px 20px;
+    color: #CDCDCD;
+}
+
+.calendar-header h3{
+    color: #E5E5E5;
+}
+
+@media(min-width: 1178px){
+    .day-of-week-short{
+        display: none;
+    }
+    .day-of-week{
+        display: block;
+    }
+}
+@media(max-width: 1178px){
+    .day-of-week-short{
+        display: block;
+    }
+    .day-of-week{
+        display: none;
+    }
+}
+
+@media(max-width: 767px){
+    .calendar-controls {
+        top: 36px !important;
+    }
+
+    .empty-day{
+        display: none;
+    }
+
+    .page-content-sidebar{
+        float: none;
+        width: 100%;
+    }
+
+    .calendar-wrapper{
+        position: relative;
+        right: 0px;
+        width: 100%;
+    }
+}
+
+@media(min-width: 767px){
+    .calendar-wrapper{
+        height: 400px;
+    }
+}
+
+@media(min-width: 600px) and (max-width: 767px){
+    .empty-day{
+        display: block;
+    }
+    .calendar-wrapper{
+        height: 400px;
+    }
+}
+
+@media(max-width: 600px){
+    .day-info{
+        display: none;
+    }
+
+    .day-info-mobile{
+        display: block;
+    }
+}
+
+.info-feriado{
+    display: block;
+    position: absolute;
+    top: 3px;
+    right: 3px;
+}
+
+
+
+@media(min-width: 600px){                
+    .day-info{
+        display: block;
+        position: absolute;
+        bottom: 3px;
+        right: 3px;
+    }
+
+    .day-info-mobile{
+        display: none;
+    }
+}
+
+.calendar-header h3 {
+    padding-left: 20px;
+}
+
+.calendar-controls {
+    position: absolute;
+    right: 25px;
+    top: 16px;
+}
+
+.day-info, .day-info-mobile{
+    color: #fff;
+}
+.day:focus, .day:hover{
+    text-decoration: none !important;
+}
+
+
+
+.day{
+    height: 100%;
+    width: 100%;
+}
+
+.month-title{
+    top: 0;
+}
+
+.fc-row > div:hover{
+    background: rgba(200, 200, 200, 0.3);
+    text-decoration: none;
+}
