@@ -10,7 +10,7 @@
     <name>ClickTimeWeb</name>
  
     <parent>
-        <groupId>com.edgard</groupId>
+        <groupId>com.clicktime</groupId>
         <artifactId>ClickTime</artifactId>
         <version>0.0.1</version>
     </parent>
