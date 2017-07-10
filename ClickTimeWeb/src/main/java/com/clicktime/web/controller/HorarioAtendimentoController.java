@@ -22,84 +22,56 @@ public class HorarioAtendimentoController {
 
     @RequestMapping(value = "/agenda/{year}/{month}/{day}/bloquearHorarios", method = RequestMethod.POST)
     public String block(HttpSession session, @PathVariable Integer year, @PathVariable Integer month, @PathVariable Integer day, Long[] horario,
-            String aplicar, Boolean aplicarSabado, Boolean aplicarDomingo, Boolean aplicarFeriados, String jsonFeriados) {
-        String url = "";
-        try {
-            DateTime dt = new DateTime(year, month, day, 0, 0);
-            if (horario != null) {
-                ServiceLocator.getHorarioAtendimentoService().updateList(horario, HorarioAtendimentoService.BLOCK_HORARIO_ATENDIMENTO);
-            }
-            url = "redirect:/agenda/" + dt.toString("yyyy/MM/dd/");
-            //replicarHorarios(dt, session, aplicar, aplicarDomingo, aplicarSabado, aplicarFeriados, jsonFeriados);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            url = "/error";
+            String aplicar, Boolean aplicarSabado, Boolean aplicarDomingo, Boolean aplicarFeriados, String jsonFeriados) throws Exception {
+        DateTime dt = new DateTime(year, month, day, 0, 0);
+        if (horario != null) {
+            ServiceLocator.getHorarioAtendimentoService().updateList(horario, HorarioAtendimentoService.BLOCK_HORARIO_ATENDIMENTO);
         }
-        return url;
+        //replicarHorarios(dt, session, aplicar, aplicarDomingo, aplicarSabado, aplicarFeriados, jsonFeriados);
+
+        return "redirect:/agenda/" + dt.toString("yyyy/MM/dd/");
     }
 
     @RequestMapping(value = "/agenda/{year}/{month}/{day}/liberarHorarios", method = RequestMethod.POST)
     public String release(HttpSession session, @PathVariable Integer year, @PathVariable Integer month,
             @PathVariable Integer day, Long[] horario, String aplicar,
-            Boolean aplicarSabado, Boolean aplicarDomingo, Boolean aplicarFeriados, String jsonFeriados) {
+            Boolean aplicarSabado, Boolean aplicarDomingo, Boolean aplicarFeriados, String jsonFeriados) throws Exception {
 
-        String url = "";
-        try {
-            DateTime dt = new DateTime(year, month, day, 0, 0);
-            if (horario != null) {
-                ServiceLocator.getHorarioAtendimentoService().updateList(horario, HorarioAtendimentoService.RELEASE_HORARIO_ATENDIMENTO);
-            }
-            //verificar..
-            //replicarHorarios(dt, session, aplicar, aplicarDomingo, aplicarSabado, aplicarFeriados, jsonFeriados);
-            url = "redirect:/agenda/" + dt.toString("yyyy/MM/dd/");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            url = "/error";
+        DateTime dt = new DateTime(year, month, day, 0, 0);
+        if (horario != null) {
+            ServiceLocator.getHorarioAtendimentoService().updateList(horario, HorarioAtendimentoService.RELEASE_HORARIO_ATENDIMENTO);
         }
+        //verificar..
+        //replicarHorarios(dt, session, aplicar, aplicarDomingo, aplicarSabado, aplicarFeriados, jsonFeriados);
 
-        return url;
+        return "redirect:/agenda/" + dt.toString("yyyy/MM/dd/");
     }
 
     @RequestMapping(value = "/agenda/{year}/{month}/{day}/cadastrarHorarios")
-    public String create(@PathVariable Integer year, @PathVariable Integer month, @PathVariable Integer day, HttpSession session) {
-        String url = "";
-        try {
-            Profissional p = (Profissional) session.getAttribute("usuarioLogado");
-            DiaAtendimento da = new DiaAtendimento();
+    public String create(@PathVariable Integer year, @PathVariable Integer month, @PathVariable Integer day, HttpSession session) throws Exception {
+        Profissional p = (Profissional) session.getAttribute("usuarioLogado");
+        DiaAtendimento da = new DiaAtendimento();
 
-            DateTime dt = new DateTime(year, month, day, 1, 1);
+        DateTime dt = new DateTime(year, month, day, 1, 1);
 
-            da.setProfissional(p);
-            da.setData(dt);
-            ServiceLocator.getDiaAtendimentoService().readOrCreate(da);
-            ServiceLocator.getHorarioAtendimentoService().generateHorarioAtendimentoList(da);
-            url = "redirect:/agenda/" + dt.toString("yyyy/MM/dd/");
-        } catch (Exception e) {
-            e.printStackTrace();
-            url = "/error";
-        }
+        da.setProfissional(p);
+        da.setData(dt);
+        ServiceLocator.getDiaAtendimentoService().readOrCreate(da);
+        ServiceLocator.getHorarioAtendimentoService().generateHorarioAtendimentoList(da);
 
-        return url;
+        return "redirect:/agenda/" + dt.toString("yyyy/MM/dd/");
     }
 
     @RequestMapping(value = "/agenda/{year}/{month}/{day}/replicarHorarios", method = RequestMethod.POST)
     public String replicar(HttpSession session, @PathVariable Integer year, @PathVariable Integer month,
             @PathVariable Integer day, Long diaAtendimentoID, String aplicar,
-            Boolean aplicarSabado, Boolean aplicarDomingo, Boolean aplicarFeriados, String jsonFeriados, Boolean bloquearReservados) {
-        String url = "";
+            Boolean aplicarSabado, Boolean aplicarDomingo, Boolean aplicarFeriados, String jsonFeriados, Boolean bloquearReservados) throws Exception {
         DateTime dt = new DateTime(year, month, day, 1, 1);
-        try {
-            DiaAtendimento diaAtendimento = ServiceLocator.getDiaAtendimentoService().readById(diaAtendimentoID);
-            replicarHorarios(diaAtendimento, session, aplicar, aplicarDomingo, aplicarSabado, aplicarFeriados, jsonFeriados, bloquearReservados);
-            url = "redirect:/agenda/" + dt.toString("yyyy/MM/dd/");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            url = "/error";
-        }
-        return url;
+        DiaAtendimento diaAtendimento = ServiceLocator.getDiaAtendimentoService().readById(diaAtendimentoID);
+        replicarHorarios(diaAtendimento, session, aplicar, aplicarDomingo, aplicarSabado, aplicarFeriados, jsonFeriados, bloquearReservados);
+        return "redirect:/agenda/" + dt.toString("yyyy/MM/dd/");
     }
 
-    
     public void gerarDias(DiaAtendimento dia,
             String aplicar, Boolean aplicarDomingo, Boolean aplicarSabado, Boolean aplicarFeriados,
             String jsonFeriados, HttpSession session, List<HorarioAtendimento> horarioList, Boolean bloquarReservados) {

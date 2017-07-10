@@ -2,6 +2,7 @@ package com.clicktime.model.service;
 
 import com.clicktime.model.ConnectionManager;
 import com.clicktime.model.ErrorMessage;
+import com.clicktime.model.ServiceLocator;
 import com.clicktime.model.base.service.BaseExecucaoService;
 import com.clicktime.model.criteria.ExecucaoCriteria;
 import com.clicktime.model.dao.ExecucaoDAO;
@@ -143,9 +144,7 @@ public class ExecucaoService implements BaseExecucaoService {
     }
 
     public void updateUnidadeTempo(Profissional profissional) throws Exception {
-        Map<String, Object> criteria = new HashMap<String, Object>();
-        criteria.put(ExecucaoCriteria.PROFISSIONAL_FK_EQ, profissional.getId());
-        List<Execucao> execucaoList = readByCriteria(criteria, null);
+        List<Execucao> execucaoList = readByProfissional(profissional);
 
         Connection connection = ConnectionManager.getInstance().getConnection();
 
@@ -262,6 +261,13 @@ public class ExecucaoService implements BaseExecucaoService {
     @Override
     public Map<String, String> validateForUpdate(Map<String, Object> fields) throws Exception {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public List<Execucao> readByProfissional(Profissional profissional) throws Exception {
+        Map<String, Object> criteria = new HashMap<>();
+        criteria.put(ExecucaoCriteria.PROFISSIONAL_FK_EQ, profissional.getId());
+        return readByCriteria(criteria, null);
     }
 
 }

@@ -7,7 +7,9 @@ import java.util.List;
 import org.joda.time.DateTime;
 
 public interface BaseExecucaoService extends BaseService<Execucao>{
-    public DateTime calcularUnidadeTempo(List<Execucao> execucaoList) throws Exception;
+    DateTime calcularUnidadeTempo(List<Execucao> execucaoList) throws Exception;
     
-    public void delete(Long id, Profissional profissional) throws Exception;
+    void delete(Long id, Profissional profissional) throws Exception;
+    
+    List<Execucao> readByProfissional(Profissional profissional) throws Exception;
 }

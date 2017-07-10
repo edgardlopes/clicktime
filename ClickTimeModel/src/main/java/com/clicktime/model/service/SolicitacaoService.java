@@ -8,6 +8,7 @@ import com.clicktime.model.dao.SolicitacaoDAO;
 import com.clicktime.model.entity.DiaAtendimento;
 import com.clicktime.model.entity.HorarioAtendimento;
 import com.clicktime.model.entity.Solicitacao;
+import com.clicktime.model.entity.Usuario;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -303,5 +304,10 @@ public class SolicitacaoService implements BaseSolicitacaoService {
         } finally {
             connection.close();
         }
+    }
+
+    @Override
+    public List<Solicitacao> readByCliente(Usuario usuario) throws Exception {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

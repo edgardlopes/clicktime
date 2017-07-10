@@ -4,6 +4,7 @@ import com.clicktime.model.ConnectionManager;
 import com.clicktime.model.ErrorMessage;
 import com.clicktime.model.ServiceLocator;
 import com.clicktime.model.base.service.BaseProfissionalService;
+import com.clicktime.model.criteria.ProfissionalCriteria;
 import com.clicktime.model.dao.ProfissionalDAO;
 import com.clicktime.model.entity.Profissional;
 import com.clicktime.model.fields.ProfissionalFields;
@@ -188,6 +189,14 @@ public class ProfissionalService implements BaseProfissionalService {
         errors.remove(UsuarioFields.SENHA_CONFIRM);
 
         return errors;
+    }
+
+    @Override
+    public Profissional readByUserName(String userName) throws Exception {
+        Map<String, Object> criteria = new HashMap<>();
+        criteria.put(ProfissionalCriteria.NOME_USUARIO_EQ, userName);
+        List<Profissional> list = readByCriteria(criteria, null);
+        return list.isEmpty() ? null : list.get(0);
     }
 
 }

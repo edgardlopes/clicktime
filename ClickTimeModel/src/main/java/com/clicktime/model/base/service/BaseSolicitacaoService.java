@@ -2,6 +2,7 @@ package com.clicktime.model.base.service;
 
 import com.clicktime.model.base.BaseService;
 import com.clicktime.model.entity.Solicitacao;
+import com.clicktime.model.entity.Usuario;
 import java.util.List;
 import java.util.Map;
 import org.joda.time.DateTime;
@@ -17,4 +18,6 @@ public interface BaseSolicitacaoService extends BaseService<Solicitacao>{
     public Boolean existsSolicitacao(Long execucaoFK, Long clienteFK, Long diaAtendimentoFK, DateTime horaInicio, DateTime horaFim) throws Exception;
     public Solicitacao getSolicitacaoFromHorarioAtendimentoId(Long horarioAtendimentoId, String status) throws Exception;
     public void avaliar(Long id, Float score) throws Exception;
+    
+    List<Solicitacao> readByCliente(Usuario usuario) throws Exception;
 }
