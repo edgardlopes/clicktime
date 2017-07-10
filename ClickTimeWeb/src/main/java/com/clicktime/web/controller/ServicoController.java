@@ -2,13 +2,13 @@ package com.clicktime.web.controller;
 
 import com.clicktime.model.ServiceLocator;
 import com.clicktime.model.criteria.ServicoCriteria;
-import com.clicktime.model.criteria.SolicitacaoCriteria;
 import com.clicktime.model.entity.CategoriaServico;
 import com.clicktime.model.entity.Execucao;
 import com.clicktime.model.entity.Profissional;
 import com.clicktime.model.entity.Servico;
 import com.clicktime.model.fields.ExecucaoServicoFields;
 import com.clicktime.model.service.calendario.CalendarioService;
+import static com.clicktime.web.interceptor.SessionUtils.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +33,7 @@ public class ServicoController {
 
     @RequestMapping(value = "/servico/servicos", method = RequestMethod.GET)
     public String servicos(Model model, HttpSession session) throws Exception {
-        final Profissional profissional = (Profissional) session.getAttribute("usuarioLogado");
+        final Profissional profissional = (Profissional) getLoggedUser(session);
         List<Execucao> execucaoList = ServiceLocator.getExecucaoService().readByProfissional(profissional);
         model.addAttribute("execucaoList", execucaoList);
         model.addAttribute("isServicos", "active");
@@ -60,7 +60,7 @@ public class ServicoController {
         fields.put(ExecucaoServicoFields.DURACAO, duracao);
         fields.put(ExecucaoServicoFields.DESCRICAO, descricao);
 
-        Profissional profissional = (Profissional) session.getAttribute("usuarioLogado");
+        Profissional profissional = (Profissional) getLoggedUser(session);
         fields.put(ExecucaoServicoFields.PROFISSIONAL, profissional);
         Map<String, String> errors = ServiceLocator.getExecucaoService().validateForCreate(fields);
         if (errors.isEmpty()) {
@@ -75,7 +75,7 @@ public class ServicoController {
             ServiceLocator.getExecucaoService().create(execucao);
 
             Profissional profissionalAtualizado = ServiceLocator.getProfissionalService().readById(profissional.getId());
-            session.setAttribute("usuarioLogado", profissionalAtualizado);
+            setLoggedUser(session, profissionalAtualizado);
             url = "redirect:/servico/servicos";
         } else {
             url = "/servico/cadastro-servico";
@@ -95,10 +95,10 @@ public class ServicoController {
     @RequestMapping(value = "/servico/{id}/excluir", method = RequestMethod.GET)
     public String delete(@PathVariable Long id, HttpSession session, Model model) throws Exception {
 
-        Profissional p = (Profissional) session.getAttribute("usuarioLogado");
+        Profissional p = (Profissional) getLoggedUser(session);
         ServiceLocator.getExecucaoService().delete(id, p);
         Profissional profissionalAtualizado = ServiceLocator.getProfissionalService().readById(p.getId());
-        session.setAttribute("usuarioLogado", profissionalAtualizado);
+        setLoggedUser(session, profissionalAtualizado);
 
         return "redirect:/servico/servicos";
     }

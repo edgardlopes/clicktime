@@ -9,6 +9,7 @@ import com.clicktime.model.entity.HorarioAtendimento;
 import com.clicktime.model.entity.Profissional;
 import com.clicktime.model.entity.Solicitacao;
 import com.clicktime.model.entity.Usuario;
+import static com.clicktime.web.interceptor.SessionUtils.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,8 +32,9 @@ public class SolicitacaoController {
     public String reservarHorario(String execucaoID, String horarioSelecionado, HttpSession session, Model model) throws Exception {
         String url = "";
         String[] aux = horarioSelecionado.split(", ");
+        final Usuario usuarioLogado = getLoggedUser(session);
 
-        Long clienteFK = ((Usuario) session.getAttribute("usuarioLogado")).getId();
+        Long clienteFK = usuarioLogado.getId();
         DiaAtendimento dia = ServiceLocator.getHorarioAtendimentoService().readById(Long.parseLong(aux[0])).getDiaAtendimento();
         HorarioAtendimento horaInicio = ServiceLocator.getHorarioAtendimentoService().readById(Long.parseLong(aux[0]));
         HorarioAtendimento horaFim = ServiceLocator.getHorarioAtendimentoService().readById(Long.parseLong(aux[aux.length - 1]));
@@ -53,8 +55,7 @@ public class SolicitacaoController {
             solicitacao.setExecucao(execucao);
             solicitacao.setHorarioAtendimentoList(horarioAtendimentoList);
 
-            Usuario usuario = (Usuario) session.getAttribute("usuarioLogado");
-            solicitacao.setUsuario(usuario);
+            solicitacao.setUsuario(usuarioLogado);
 
             ServiceLocator.getSolicitacaoService().solicitarHorario(solicitacao);
             solicitacao = ServiceLocator.getSolicitacaoService().readById(solicitacao.getId());
@@ -114,8 +115,7 @@ public class SolicitacaoController {
             model.addAttribute("status", status);
         }
 
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogado");
-        List<Solicitacao> solicitacaoList = null;
+        Usuario usuario = getLoggedUser(session);
 //        solicitacaoList.get(0).getHorarioAtendimentoList().get(0).getDiaAtendimento().
         if (usuario instanceof Profissional) {
             criteria.put(SolicitacaoCriteria.PROFISSIONAL_FK_EQ, usuario.getId());
@@ -126,7 +126,7 @@ public class SolicitacaoController {
             url = "/solicitacao/cliente/list";
         }
 
-        solicitacaoList = ServiceLocator.getSolicitacaoService().readByCriteria(criteria, (pagina - 1) * SolicitacaoDAO.LIMIT);
+        List<Solicitacao> solicitacaoList = ServiceLocator.getSolicitacaoService().readByCriteria(criteria, (pagina - 1) * SolicitacaoDAO.LIMIT);
 //                solicitacaoList = ServiceLocator.getSolicitacaoService().readByCriteria(criteria, null);
         Long count = ServiceLocator.getSolicitacaoService().countByCriteria(criteria);
         Integer paginas = Math.round(count.floatValue() / SolicitacaoDAO.LIMIT.floatValue());
@@ -229,7 +229,7 @@ public class SolicitacaoController {
     @RequestMapping(value = "/avaliacoes", method = RequestMethod.GET)
     public String getAvaliacoes(Model model, HttpSession session) throws Exception {
         Map<String, Object> criteria = new HashMap<>();
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogado");
+        Usuario usuario = getLoggedUser(session);
         criteria.put(SolicitacaoCriteria.CLIENTE_FK_EQ, usuario.getId());
 
         DateTime now = new DateTime();

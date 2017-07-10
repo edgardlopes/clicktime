@@ -9,6 +9,7 @@ import com.clicktime.model.entity.Usuario;
 import com.clicktime.model.fields.ProfissionalFields;
 import com.clicktime.model.fields.UsuarioFields;
 import com.clicktime.model.service.calendario.CalendarioService;
+import static com.clicktime.web.interceptor.SessionUtils.*;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +42,7 @@ public class UsuarioController {
         Usuario usuarioLogado = ServiceLocator.getUsuarioService().login(email, senha);
 
         if (usuarioLogado != null) {
-            session.setAttribute("usuarioLogado", usuarioLogado);
+            setLoggedUser(session, usuarioLogado);
             return "redirect:/home";
         }
 
@@ -55,7 +56,7 @@ public class UsuarioController {
 
         model.addAttribute("isHome", true);
 
-        Usuario usuarioLogado = (Usuario) session.getAttribute("usuarioLogado");
+        Usuario usuarioLogado = getLoggedUser(session);
         if (usuarioLogado instanceof Profissional) {
             //sugestao de url interativa profissional/{nome}/home
             return "redirect:/profissional/" + ((Profissional) usuarioLogado).getNomeUsuario() + "/home";
@@ -121,7 +122,7 @@ public class UsuarioController {
     //home cliente
     @RequestMapping(value = "/usuario/home", method = RequestMethod.GET)
     public String home(Model m, HttpSession session) throws Exception {
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogado");
+        Usuario usuario = getLoggedUser(session);
 
         Map<String, Object> criteria = new HashMap<>();
         criteria.put(SolicitacaoCriteria.CLIENTE_FK_EQ, usuario.getId());
@@ -148,7 +149,7 @@ public class UsuarioController {
 
     @RequestMapping(value = "/minhaConta", method = RequestMethod.GET)
     public String conta(Model model, HttpSession session) throws Exception {
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogado");
+        Usuario usuario = getLoggedUser(session);
         if (usuario instanceof Profissional) {
             model.addAttribute("isProfissional", true);
         } else {
@@ -178,7 +179,7 @@ public class UsuarioController {
         fields.put(ProfissionalFields.HORA_INICIO, horaInicio);
         fields.put(ProfissionalFields.HORA_FIM, horaFim);
 
-        Usuario usuarioLogado = (Usuario) session.getAttribute("usuarioLogado");
+        Usuario usuarioLogado = getLoggedUser(session);
         if (usuarioLogado instanceof Profissional) {
             Map<String, String> errors = ServiceLocator.getProfissionalService().validateForUpdate(fields);
             if (errors.isEmpty()) {
@@ -193,8 +194,7 @@ public class UsuarioController {
                 profissional.setHoraInicio(CalendarioService.parseStringToDateTime(horaInicio, "HH:mm"));
                 profissional.setHoraFim(CalendarioService.parseStringToDateTime(horaFim, "HH:mm"));
                 ServiceLocator.getProfissionalService().update(profissional);
-                session.removeAttribute("usuarioLogado");
-                session.setAttribute("usuarioLogado", profissional);
+                setLoggedUser(session, profissional);
 
                 Avatar a = new Avatar();
                 if (avatar.isEmpty()) {
@@ -223,8 +223,7 @@ public class UsuarioController {
                 usuario.setEmail(email);
                 usuario.setTelefone(telefone);
                 ServiceLocator.getUsuarioService().update(usuario);
-                session.removeAttribute("usuarioLogado");
-                session.setAttribute("usuarioLogado", usuario);
+                setLoggedUser(session, usuario);
 
                 Avatar a = new Avatar();
 
@@ -250,7 +249,7 @@ public class UsuarioController {
 
     @RequestMapping(value = "/usuarioLogado/img.jpg", method = RequestMethod.GET)
     public void streamImagem(HttpSession session, HttpServletResponse response) throws Exception {
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogado");
+        Usuario usuario = getLoggedUser(session);
         Avatar avatar = ServiceLocator.getUsuarioService().getAvatar(usuario.getId());
         response.setContentType("image/jpg");
         response.getOutputStream().write(avatar.getImagem());

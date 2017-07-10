@@ -14,15 +14,21 @@ import javax.servlet.http.HttpSession;
  */
 public final class SessionUtils {
 
+    public static final String USUARIO_LOGADO = "usuarioLogado";
+
     private SessionUtils() {
 
     }
 
     public static boolean hasLoggedUser(HttpSession session) {
-        return session.getAttribute("usuarioLogado") != null;
+        return getLoggedUser(session) != null;
     }
 
     public static Usuario getLoggedUser(HttpSession session) {
-        return (Usuario) session.getAttribute("usuarioLogado");
+        return (Usuario) session.getAttribute(USUARIO_LOGADO);
+    }
+    
+    public static void setLoggedUser(HttpSession session, Usuario usuario){
+        session.setAttribute(USUARIO_LOGADO, usuario);
     }
 }

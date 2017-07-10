@@ -1,14 +1,10 @@
 package com.clicktime.web.controller;
 
 import com.clicktime.model.ServiceLocator;
-import com.clicktime.model.criteria.ExecucaoCriteria;
 import com.clicktime.model.criteria.ProfissionalCriteria;
-import com.clicktime.model.criteria.SolicitacaoCriteria;
 import com.clicktime.model.entity.Avatar;
 import com.clicktime.model.entity.Execucao;
 import com.clicktime.model.entity.Profissional;
-import com.clicktime.model.entity.Solicitacao;
-import com.clicktime.model.entity.Usuario;
 import com.clicktime.model.fields.ProfissionalFields;
 import com.clicktime.model.fields.UsuarioFields;
 import com.clicktime.model.service.calendario.CalendarioService;
@@ -16,7 +12,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.print.attribute.HashAttributeSet;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.apache.commons.io.IOUtils;

@@ -6,9 +6,7 @@
 package com.clicktime.web.controller;
 
 import com.clicktime.model.ServiceLocator;
-import com.clicktime.model.criteria.SolicitacaoCriteria;
 import com.clicktime.model.entity.CategoriaServico;
-import com.clicktime.model.entity.Profissional;
 import com.clicktime.model.entity.Servico;
 import com.clicktime.model.fields.CategoriaServicoFields;
 import java.util.HashMap;

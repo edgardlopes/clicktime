@@ -135,18 +135,16 @@ public class AgendaClienteController {
         Execucao execucao = null;
 
         if (diaAtendimentoList.size() > 0) {
-            da = diaAtendimentoList.get(0);
-
-            horarioList = ServiceLocator.getHorarioAtendimentoService().read(da);
-
-            execucaoList = ServiceLocator.getExecucaoService().readByProfissional(p);
 
             if (servicoID != null) {
                 execucao = ServiceLocator.getExecucaoService().readById(servicoID);
             } else {
+                execucaoList = ServiceLocator.getExecucaoService().readByProfissional(p);
                 execucao = execucaoList.get(0);
             }
 
+            da = diaAtendimentoList.get(0);
+            horarioList = ServiceLocator.getHorarioAtendimentoService().read(da);
             novaLista = ServiceLocator.getHorarioAtendimentoService().agruparHorarios(execucao, horarioList, p);
         }
 

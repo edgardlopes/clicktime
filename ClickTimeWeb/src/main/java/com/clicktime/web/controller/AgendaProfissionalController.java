@@ -1,16 +1,13 @@
 package com.clicktime.web.controller;
 
 import com.clicktime.model.ServiceLocator;
-import com.clicktime.model.criteria.SolicitacaoCriteria;
 import com.clicktime.model.entity.DiaAtendimento;
 import com.clicktime.model.entity.HorarioAtendimento;
 import com.clicktime.model.entity.Profissional;
-import com.clicktime.model.entity.Usuario;
 import com.clicktime.model.service.calendario.CalendarioService;
+import static com.clicktime.web.interceptor.SessionUtils.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.joda.time.DateTime;
@@ -27,14 +24,14 @@ public class AgendaProfissionalController {
     //url para profissional
     @RequestMapping(value = "/agenda/{year}", method = RequestMethod.GET)
     public String getAgenda(@PathVariable Integer year, Model m, HttpSession session) {
-        m.addAttribute("idProfissional", ((Profissional) session.getAttribute("usuarioLogado")).getId());
+        m.addAttribute("idProfissional", ((Profissional) getLoggedUser(session)).getId());
         m.addAttribute("year", year);
         return "/agenda/months";
     }
 
     @RequestMapping(value = "/agenda/{year}/{month}/{day}", method = RequestMethod.GET)
     public String getAgenda(@PathVariable Integer year, @PathVariable Integer month, @PathVariable Integer day, HttpSession session, Model m) throws Exception {
-        Profissional p = (Profissional) session.getAttribute("usuarioLogado");
+        Profissional p = (Profissional) getLoggedUser(session);
         DateTime dt = new DateTime(year, month, day, 1, 1);
         List<HorarioAtendimento> horarioList = new ArrayList<>();
         DiaAtendimento dia = ServiceLocator.getDiaAtendimentoService().readDiaAtendimentoFromDate(dt, p);
@@ -52,7 +49,7 @@ public class AgendaProfissionalController {
 
     @RequestMapping(value = "/agenda/{year}/{month}", method = RequestMethod.GET)
     public String getCalendario(@PathVariable Integer year, @PathVariable Integer month, Model m, HttpSession session) throws Exception {
-        Profissional p = (Profissional) session.getAttribute("usuarioLogado");
+        Profissional p = (Profissional) getLoggedUser(session);
         CalendarioService service = ServiceLocator.getCalendarioService(year, month, p, true);
         m.addAllAttributes(service.getInformations());
 
@@ -66,7 +63,7 @@ public class AgendaProfissionalController {
 
         try {
             DateTime date = CalendarioService.parseStringToDateTime(data, "dd/MM/yyyy");
-            Profissional profissional = (Profissional) session.getAttribute("usuarioLogado");
+            Profissional profissional = (Profissional) getLoggedUser(session);
             DiaAtendimento dia = ServiceLocator.getDiaAtendimentoService().readDiaAtendimentoFromDate(date, profissional);
             json = "{\"status\":200, \"dia\":";
             json += dia.toJson();

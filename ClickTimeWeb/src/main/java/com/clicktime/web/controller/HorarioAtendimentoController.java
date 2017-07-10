@@ -7,6 +7,7 @@ import com.clicktime.model.entity.HorarioAtendimento;
 import com.clicktime.model.entity.Profissional;
 import com.clicktime.model.service.HorarioAtendimentoService;
 import com.clicktime.model.service.calendario.CalendarioService;
+import static com.clicktime.web.interceptor.SessionUtils.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +50,7 @@ public class HorarioAtendimentoController {
 
     @RequestMapping(value = "/agenda/{year}/{month}/{day}/cadastrarHorarios")
     public String create(@PathVariable Integer year, @PathVariable Integer month, @PathVariable Integer day, HttpSession session) throws Exception {
-        Profissional p = (Profissional) session.getAttribute("usuarioLogado");
+        Profissional p = (Profissional) getLoggedUser(session);
         DiaAtendimento da = new DiaAtendimento();
 
         DateTime dt = new DateTime(year, month, day, 1, 1);
@@ -103,7 +104,7 @@ public class HorarioAtendimentoController {
 
                 DiaAtendimento diaAtendimento = new DiaAtendimento();
                 diaAtendimento.setData(comeco);
-                diaAtendimento.setProfissional((Profissional) session.getAttribute("usuarioLogado"));
+                diaAtendimento.setProfissional((Profissional) getLoggedUser(session));
                 try {
                     ServiceLocator.getDiaAtendimentoService().readOrCreate(diaAtendimento);
                     if (!diaAtendimento.getId().equals(dia.getId())) {
@@ -162,7 +163,7 @@ public class HorarioAtendimentoController {
 
     public void replicarHorarios(DiaAtendimento diaAtendimento, HttpSession session, String aplicar,
             Boolean aplicarDomingo, Boolean aplicarSabado, Boolean aplicarFeriados, String jsonFeriados, Boolean bloquearReservados) throws Exception {
-        diaAtendimento.setProfissional((Profissional) session.getAttribute("usuarioLogado"));
+        diaAtendimento.setProfissional((Profissional) getLoggedUser(session));
 
         Map<String, Object> criteria = new HashMap<>();
         criteria.put(HorarioAtendimentoCriteria.DIA_ATENDIMENTO_FK_EQ, diaAtendimento.getId());
