@@ -92,14 +92,6 @@ public class ProfissionalController {
 
     @RequestMapping(value = "/profissional/{urlProfissional}/home", method = RequestMethod.GET)
     public String homeProfissional(Model m, @PathVariable String urlProfissional, HttpSession session) throws Exception {
-        Map<String, Object> criteria = new HashMap<>();
-        criteria.put(SolicitacaoCriteria.STATUS_EQ, Solicitacao.AGUARDANDO_CONFIRMACAO);
-        criteria.put(SolicitacaoCriteria.PROFISSIONAL_FK_EQ, ((Usuario) session.getAttribute("usuarioLogado")).getId());
-
-        Long count = ServiceLocator.getSolicitacaoService().countByCriteria(criteria);
-        m.addAttribute("countSolicitacao", count);
-        criteria.remove(SolicitacaoCriteria.STATUS_EQ);
-        m.addAttribute("solicitacaoCount", ServiceLocator.getSolicitacaoService().countByCriteria(criteria));
         return "/profissional/home";
     }
 
@@ -120,12 +112,6 @@ public class ProfissionalController {
         List<Profissional> profissionalList = ServiceLocator.getProfissionalService().readByCriteria(criteria, null);
         m.addAttribute("profissionalList", profissionalList);
 
-        criteria = new HashMap<>();
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogado");
-        criteria.put(SolicitacaoCriteria.CLIENTE_FK_EQ, usuario.getId());
-        m.addAttribute("solicitacaoCount", ServiceLocator.getSolicitacaoService().countByCriteria(criteria));
-        m.addAttribute("profissionalFavorito", ServiceLocator.getUsuarioService().getProfissionalFavorito(usuario.getId()));
-
         return "/usuario/select-profissional";
     }
 
@@ -137,14 +123,6 @@ public class ProfissionalController {
         if (profissional != null) {
             List<Execucao> execucaoList = ServiceLocator.getExecucaoService().readByProfissional(profissional);
             m.addAttribute("execucaoList", execucaoList);
-            Usuario usuario = (Usuario) session.getAttribute("usuarioLogado");
-            if (usuario != null) {
-                Map<String, Object> criteria = new HashMap<>();
-                criteria.put(SolicitacaoCriteria.CLIENTE_FK_EQ, usuario.getId());
-                m.addAttribute("solicitacaoCount", ServiceLocator.getSolicitacaoService().countByCriteria(criteria));
-                m.addAttribute("profissionalFavorito", ServiceLocator.getUsuarioService().getProfissionalFavorito(usuario.getId()));
-            }
-
         }
         return "/profissional/perfil-profissional";
     }

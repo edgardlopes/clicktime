@@ -61,13 +61,6 @@ public class SolicitacaoController {
             model.addAttribute("solicitacao", solicitacao);
 
             url = "/solicitacao/cliente/sucesso";
-
-            Map<String, Object> criteria = new HashMap<>();
-            criteria.put(SolicitacaoCriteria.CLIENTE_FK_EQ, usuario.getId());
-            Long count = ServiceLocator.getSolicitacaoService().countByCriteria(criteria);
-            model.addAttribute("profissionalFavorito", ServiceLocator.getUsuarioService().getProfissionalFavorito(usuario.getId()));
-            model.addAttribute("solicitacaoCount", count);
-
         } else {
             url = "/solicitacao/ja-reservada";
         }
@@ -141,14 +134,6 @@ public class SolicitacaoController {
         model.addAttribute("pagina", pagina);
         model.addAttribute("countPaginas", paginas);
 
-        criteria = new HashMap<>();
-        if (usuario instanceof Profissional) {
-            criteria.put(SolicitacaoCriteria.PROFISSIONAL_FK_EQ, usuario.getId());
-        } else {
-            criteria.put(SolicitacaoCriteria.CLIENTE_FK_EQ, usuario.getId());
-        }
-        model.addAttribute("solicitacaoCount", ServiceLocator.getSolicitacaoService().countByCriteria(criteria));
-
         model.addAttribute("solicitacao", "active");
 
         return url;
@@ -164,10 +149,6 @@ public class SolicitacaoController {
         }
 
         m.addAttribute("solicitacoesCanceladas", solicitacoesCanceladas);
-        Map<String, Object> criteria = new HashMap<>();
-        Usuario usuario = (Usuario) session.getAttribute("usuarioLogado");
-        criteria.put(SolicitacaoCriteria.PROFISSIONAL_FK_EQ, usuario.getId());
-        m.addAttribute("solicitacaoCount", ServiceLocator.getSolicitacaoService().countByCriteria(criteria));
         return "/solicitacao/profissional/solicitacao_cancelada_list";
     }
 
@@ -262,10 +243,6 @@ public class SolicitacaoController {
         model.addAttribute("solicitacaoList", solicitacaoList);
         model.addAttribute("isAvaliacao", true);
 
-        criteria = new HashMap<>();
-        criteria.put(SolicitacaoCriteria.CLIENTE_FK_EQ, usuario.getId());
-        model.addAttribute("solicitacaoCount", ServiceLocator.getSolicitacaoService().countByCriteria(criteria));
-        model.addAttribute("profissionalFavorito", ServiceLocator.getUsuarioService().getProfissionalFavorito(usuario.getId()));
         model.addAttribute("avaliacao", "active");
         return "/solicitacao/cliente/list";
     }

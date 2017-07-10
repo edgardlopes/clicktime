@@ -38,10 +38,6 @@ public class ServicoController {
         model.addAttribute("execucaoList", execucaoList);
         model.addAttribute("isServicos", "active");
 
-        Map<String, Object> criteria = new HashMap<>();
-        criteria.put(SolicitacaoCriteria.PROFISSIONAL_FK_EQ, profissional.getId());
-        model.addAttribute("solicitacaoCount", ServiceLocator.getSolicitacaoService().countByCriteria(criteria));
-
         return "/servico/servico-list";
     }
 
@@ -49,9 +45,6 @@ public class ServicoController {
     public String create(Model model, HttpSession session) throws Exception {
         List<CategoriaServico> categorias = ServiceLocator.getCategoriaServicoService().readByCriteria(new HashMap<String, Object>(), null);
         model.addAttribute("categorias", categorias);
-        Map<String, Object> criteria = new HashMap<>();
-        criteria.put(SolicitacaoCriteria.PROFISSIONAL_FK_EQ, ((Profissional) session.getAttribute("usuarioLogado")).getId());
-        model.addAttribute("solicitacaoCount", ServiceLocator.getSolicitacaoService().countByCriteria(criteria));
         model.addAttribute("isNovoServico", true);
 
         return "/servico/cadastro-servico";
@@ -107,11 +100,6 @@ public class ServicoController {
         Profissional profissionalAtualizado = ServiceLocator.getProfissionalService().readById(p.getId());
         session.setAttribute("usuarioLogado", profissionalAtualizado);
 
-        Map<String, Object> criteria = new HashMap<>();
-        criteria = new HashMap<>();
-        criteria.put(SolicitacaoCriteria.PROFISSIONAL_FK_EQ, ((Profissional) session.getAttribute("usuarioLogado")).getId());
-        model.addAttribute("solicitacaoCount", ServiceLocator.getSolicitacaoService().countByCriteria(criteria));
-
         return "redirect:/servico/servicos";
     }
 
@@ -120,10 +108,6 @@ public class ServicoController {
         Execucao execucao = ServiceLocator.getExecucaoService().readById(id);
         model.addAttribute("execucao", execucao);
         model.addAttribute("isUpdate", true);
-
-        Map<String, Object> criteria = new HashMap<>();
-        criteria.put(SolicitacaoCriteria.PROFISSIONAL_FK_EQ, ((Profissional) session.getAttribute("usuarioLogado")).getId());
-        model.addAttribute("solicitacaoCount", ServiceLocator.getSolicitacaoService().countByCriteria(criteria));
 
         return "/servico/cadastro-servico";
     }

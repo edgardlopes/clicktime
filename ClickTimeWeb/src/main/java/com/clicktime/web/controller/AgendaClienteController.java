@@ -8,13 +8,11 @@ package com.clicktime.web.controller;
 import com.clicktime.model.ServiceLocator;
 import com.clicktime.model.criteria.DiaAtendimentoCriteria;
 import com.clicktime.model.criteria.HorarioAtendimentoCriteria;
-import com.clicktime.model.criteria.SolicitacaoCriteria;
 import com.clicktime.model.entity.DiaAtendimento;
 import com.clicktime.model.entity.DiaAtendimentoResumo;
 import com.clicktime.model.entity.Execucao;
 import com.clicktime.model.entity.HorarioAtendimento;
 import com.clicktime.model.entity.Profissional;
-import com.clicktime.model.entity.Usuario;
 import com.clicktime.model.service.calendario.CalendarioService;
 import com.clicktime.model.service.calendario.Day;
 import java.util.ArrayList;
@@ -49,11 +47,6 @@ public class AgendaClienteController {
             execucao = ServiceLocator.getExecucaoService().readByProfissional(p).get(0);
         }
         m.addAttribute("execucao", execucao);
-
-        Map<String, Object> criteria = new HashMap<>();
-        criteria.put(SolicitacaoCriteria.CLIENTE_FK_EQ, ((Usuario) session.getAttribute("usuarioLogado")).getId());
-        m.addAttribute("solicitacaoCount", ServiceLocator.getSolicitacaoService().countByCriteria(criteria));
-        m.addAttribute("profissionalFavorito", ServiceLocator.getUsuarioService().getProfissionalFavorito(((Usuario) session.getAttribute("usuarioLogado")).getId()));
 
         return "/agenda/months";
     }
@@ -114,11 +107,6 @@ public class AgendaClienteController {
             m.addAllAttributes(service.getInformations());
             m.addAttribute(CalendarioService.DAYS_OF_MONTH, weekList);
 
-            Map<String, Object> criteria = new HashMap<>();
-            criteria.put(SolicitacaoCriteria.CLIENTE_FK_EQ, ((Usuario) session.getAttribute("usuarioLogado")).getId());
-            m.addAttribute("solicitacaoCount", ServiceLocator.getSolicitacaoService().countByCriteria(criteria));
-            m.addAttribute("profissionalFavorito", ServiceLocator.getUsuarioService().getProfissionalFavorito(((Usuario) session.getAttribute("usuarioLogado")).getId()));
-
             url = "/agenda/calendario";
         }
 
@@ -170,12 +158,6 @@ public class AgendaClienteController {
         m.addAttribute("dataParam", dataParam);
         DateTime nowAux = new DateTime(now.getYear(), now.getMonthOfYear(), now.getDayOfMonth(), 1, 1);
         m.addAttribute("now", nowAux);
-
-        criteria = new HashMap<>();
-        criteria.put(SolicitacaoCriteria.CLIENTE_FK_EQ, ((Usuario) session.getAttribute("usuarioLogado")).getId());
-        m.addAttribute("solicitacaoCount", ServiceLocator.getSolicitacaoService().countByCriteria(criteria));
-        m.addAttribute("profissionalFavorito", ServiceLocator.getUsuarioService().getProfissionalFavorito(((Usuario) session.getAttribute("usuarioLogado")).getId()));
-
         return "/agenda/cliente/horarios";
     }
 

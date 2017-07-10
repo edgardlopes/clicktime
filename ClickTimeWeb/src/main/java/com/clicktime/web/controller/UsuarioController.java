@@ -121,12 +121,9 @@ public class UsuarioController {
     //home cliente
     @RequestMapping(value = "/usuario/home", method = RequestMethod.GET)
     public String home(Model m, HttpSession session) throws Exception {
-        Map<String, Object> criteria = new HashMap<>();
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogado");
-        criteria.put(SolicitacaoCriteria.CLIENTE_FK_EQ, usuario.getId());
-        m.addAttribute("solicitacaoCount", ServiceLocator.getSolicitacaoService().countByCriteria(criteria));
-        m.addAttribute("profissionalFavorito", ServiceLocator.getUsuarioService().getProfissionalFavorito(usuario.getId()));
 
+        Map<String, Object> criteria = new HashMap<>();
         criteria.put(SolicitacaoCriteria.CLIENTE_FK_EQ, usuario.getId());
         DateTime now = new DateTime();
         now = now.minusDays(1);
@@ -152,21 +149,13 @@ public class UsuarioController {
     @RequestMapping(value = "/minhaConta", method = RequestMethod.GET)
     public String conta(Model model, HttpSession session) throws Exception {
         Usuario usuario = (Usuario) session.getAttribute("usuarioLogado");
-        Map<String, Object> criteria = new HashMap<>();
         if (usuario instanceof Profissional) {
             model.addAttribute("isProfissional", true);
-            Profissional profissional = (Profissional) usuario;
-            model.addAttribute("usuario", usuario);
-            criteria.put(SolicitacaoCriteria.PROFISSIONAL_FK_EQ, usuario.getId());
         } else {
             model.addAttribute("isCliente", true);
-            model.addAttribute("usuario", usuario);
-            criteria.put(SolicitacaoCriteria.CLIENTE_FK_EQ, usuario.getId());
-            model.addAttribute("profissionalFavorito", ServiceLocator.getUsuarioService().getProfissionalFavorito(usuario.getId()));
-
         }
+        model.addAttribute("usuario", usuario);
         model.addAttribute("isUpdate", true);
-        model.addAttribute("solicitacaoCount", ServiceLocator.getSolicitacaoService().countByCriteria(criteria));
         model.addAttribute("minhaConta", "active");
         return "/usuario/cadastro-usuario";
     }

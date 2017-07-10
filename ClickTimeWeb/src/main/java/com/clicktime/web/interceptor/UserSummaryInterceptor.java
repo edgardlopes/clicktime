@@ -17,15 +17,28 @@ public class UserSummaryInterceptor extends HandlerInterceptorAdapter {
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response,
             Object handler, ModelAndView mv) throws Exception {
-//
-//        HttpSession session = request.getSession();
-//        Usuario usuario = (Usuario) session.getAttribute("usuarioLogado");
-//        if (!(usuario instanceof Profissional)) {
-//            Map<String, Object> criteria = new HashMap<>();
-//            criteria.put(SolicitacaoCriteria.CLIENTE_FK_EQ, usuario.getId());
-//            mv.addObject("solicitacaoCount", ServiceLocator.getSolicitacaoService().countByCriteria(criteria));
-//            mv.addObject("profissionalFavorito", ServiceLocator.getUsuarioService().getProfissionalFavorito(usuario.getId()));
-//        }
+
+        if (UriUtils.isStaticResource(request.getRequestURI())) {
+            return;
+        }
+
+        HttpSession session = request.getSession();
+        if (!SessionUtils.hasLoggedUser(session)) {
+            return;
+        }
+
+        Usuario usuario = SessionUtils.getLoggedUser(session);
+        if (usuario instanceof Profissional) {
+            Map<String, Object> criteria = new HashMap<>();
+            criteria.put(SolicitacaoCriteria.PROFISSIONAL_FK_EQ, usuario.getId());
+            mv.addObject("solicitacaoCount", ServiceLocator.getSolicitacaoService().countByCriteria(criteria));
+
+        } else {
+            Map<String, Object> criteria = new HashMap<>();
+            criteria.put(SolicitacaoCriteria.CLIENTE_FK_EQ, usuario.getId());
+            mv.addObject("solicitacaoCount", ServiceLocator.getSolicitacaoService().countByCriteria(criteria));
+            mv.addObject("profissionalFavorito", ServiceLocator.getUsuarioService().getProfissionalFavorito(usuario.getId()));
+        }
     }
 
 }

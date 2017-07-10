@@ -47,10 +47,6 @@ public class AgendaProfissionalController {
         m.addAttribute("horarioList", horarioList);
         m.addAttribute("dia", dia);
 
-        Map<String, Object> criteria = new HashMap<>();
-        criteria.put(SolicitacaoCriteria.PROFISSIONAL_FK_EQ, p.getId());
-        m.addAttribute("solicitacaoCount", ServiceLocator.getSolicitacaoService().countByCriteria(criteria));
-
         return "/agenda/profissional/horarios";
     }
 
@@ -59,10 +55,6 @@ public class AgendaProfissionalController {
         Profissional p = (Profissional) session.getAttribute("usuarioLogado");
         CalendarioService service = ServiceLocator.getCalendarioService(year, month, p, true);
         m.addAllAttributes(service.getInformations());
-
-        Map<String, Object> criteria = new HashMap<>();
-        criteria.put(SolicitacaoCriteria.PROFISSIONAL_FK_EQ, ((Profissional) session.getAttribute("usuarioLogado")).getId());
-        m.addAttribute("solicitacaoCount", ServiceLocator.getSolicitacaoService().countByCriteria(criteria));
 
         return "/agenda/calendario";
     }

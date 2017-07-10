@@ -1,5 +1,6 @@
 package com.clicktime.web.interceptor;
 
+import com.sun.jndi.toolkit.url.Uri;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -38,10 +39,10 @@ public class AAInterceptor extends HandlerInterceptorAdapter {
         boolean redirectErrorUsuario = false;
         String uri = request.getRequestURI();
 
-        if (uri.contains("css") || uri.contains("fonts") || uri.contains("img") || uri.contains("js")) {
+        if (UriUtils.isStaticResource(uri)) {
             ok = true;
         } else if (!free.contains(request.getRequestURI())) {
-            if (request.getSession().getAttribute("usuarioLogado") != null) {
+            if (SessionUtils.hasLoggedUser(request.getSession())) {
                 ok = true;
             } else {
                 redirectErrorUsuario = true;

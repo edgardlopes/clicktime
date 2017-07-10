@@ -29,9 +29,6 @@ public class CategoriaServicoController {
 
     @RequestMapping(value = "/categoria/novo", method = RequestMethod.GET)
     public String create(HttpSession session, Model model) throws Exception {
-        Map<String, Object> criteria = new HashMap<>();
-        criteria.put(SolicitacaoCriteria.PROFISSIONAL_FK_EQ, ((Profissional) session.getAttribute("usuarioLogado")).getId());
-        model.addAttribute("solicitacaoCount", ServiceLocator.getSolicitacaoService().countByCriteria(criteria));
         return "/categoria/novo";
     }
 
@@ -57,10 +54,7 @@ public class CategoriaServicoController {
 
     @RequestMapping(value = "/tipoServico/novo", method = RequestMethod.GET)
     public String createTipoServico(HttpSession session, Model model) throws Exception {
-        Map<String, Object> criteria = new HashMap<>();
-        criteria.put(SolicitacaoCriteria.PROFISSIONAL_FK_EQ, ((Profissional) session.getAttribute("usuarioLogado")).getId());
-        model.addAttribute("solicitacaoCount", ServiceLocator.getSolicitacaoService().countByCriteria(criteria));
-        model.addAttribute("categorias", ServiceLocator.getCategoriaServicoService().readByCriteria(new HashMap<String, Object>(), null));
+        model.addAttribute("categorias", ServiceLocator.getCategoriaServicoService().readByCriteria(null, null));
         return "/categoria/novo_servico";
     }
 
