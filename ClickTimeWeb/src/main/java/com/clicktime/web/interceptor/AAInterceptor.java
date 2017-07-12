@@ -1,12 +1,7 @@
 package com.clicktime.web.interceptor;
 
-import com.sun.jndi.toolkit.url.Uri;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 public class AAInterceptor extends HandlerInterceptorAdapter {

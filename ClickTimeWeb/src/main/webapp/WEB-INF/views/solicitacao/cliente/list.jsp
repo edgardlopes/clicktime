@@ -137,9 +137,7 @@
         <script src="<c:url value="/js/bootstrap.min.js"/>"></script>
         <script src="<c:url value="/js/servico.js"/>"></script>
         <script src="<c:url value="/js/sidebar_menu.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/js/moment.min.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/js/bootstrap-datetimepicker.js"/>"></script>
-        <script type="text/javascript" src="<c:url value="/js/adicionais.js"/>"></script>
+        <%@include file="../../templates/import-datepicker.jsp" %>
         <script type="text/javascript" src="<c:url value="/js/jquery.raty.js"/>"></script>
         <script>
             $('.raty').raty({

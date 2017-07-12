@@ -121,28 +121,6 @@
                 </div>
             </div>
         </section>
-<!--         About Section 
-        <section class="" id="apoio">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-12 text-center">
-                        <h2>Apoio</h2>
-                        <hr class="star-primary">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-4 col-lg-offset-2">
-                        <img src="<c:url value="/img/mattos-logo.PNG"/>" class="img-responsive center-block" alt="">
-                    </div>
-                    <div class="col-lg-4">
-                        <img src="<c:url value="/img/everaldo-logo.png"/>" class="img-responsive center-block" alt="">
-                        <p class="text-center">Everaldo Hortifruti</p>
-                        <p class="text-center">Mais qualidade para sua vida.</p>
-                        <p class="text-center">(35) 9951-1285</p>
-                    </div>
-                </div>
-            </div>
-        </section>-->
 
         <section class="success" id="participe">
             <div class="container">

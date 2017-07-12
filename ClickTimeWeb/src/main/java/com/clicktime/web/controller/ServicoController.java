@@ -52,7 +52,6 @@ public class ServicoController {
 
     @RequestMapping(value = "/servico/novo", method = RequestMethod.POST)
     public String create(HttpSession session, Model model, String categoriaFK, String servicoFK, String valor, String duracao, String descricao) throws Exception {
-        String url = "";
         Map<String, Object> fields = new HashMap<>();
         fields.put(ExecucaoServicoFields.CATEGORIA_FK, categoriaFK);
         fields.put(ExecucaoServicoFields.SERVICO_FK, servicoFK);
@@ -63,22 +62,7 @@ public class ServicoController {
         Profissional profissional = (Profissional) getLoggedUser(session);
         fields.put(ExecucaoServicoFields.PROFISSIONAL, profissional);
         Map<String, String> errors = ServiceLocator.getExecucaoService().validateForCreate(fields);
-        if (errors.isEmpty()) {
-            Execucao execucao = new Execucao();
-            Servico servico = new Servico();
-            servico.setId(Long.parseLong(servicoFK));
-            execucao.setServico(servico);
-            execucao.setValor(Float.parseFloat(valor));
-            execucao.setDescricao(descricao);
-            execucao.setDuracao(CalendarioService.parseStringToDateTime(duracao, "HH:mm"));
-            execucao.setProfissional(profissional);
-            ServiceLocator.getExecucaoService().create(execucao);
-
-            Profissional profissionalAtualizado = ServiceLocator.getProfissionalService().readById(profissional.getId());
-            setLoggedUser(session, profissionalAtualizado);
-            url = "redirect:/servico/servicos";
-        } else {
-            url = "/servico/cadastro-servico";
+        if (!errors.isEmpty()) {
             List<CategoriaServico> categorias = ServiceLocator.getCategoriaServicoService().readByCriteria(new HashMap<String, Object>(), null);
             model.addAttribute("categorias", categorias);
             try {
@@ -87,9 +71,23 @@ public class ServicoController {
             }
             model.addAttribute("execucao", fields);
             model.addAttribute("errors", errors);
+            return "/servico/cadastro-servico";
         }
 
-        return url;
+        Execucao execucao = new Execucao();
+        Servico servico = new Servico();
+        servico.setId(Long.parseLong(servicoFK));
+        execucao.setServico(servico);
+        execucao.setValor(Float.parseFloat(valor));
+        execucao.setDescricao(descricao);
+        execucao.setDuracao(CalendarioService.parseStringToDateTime(duracao, "HH:mm"));
+        execucao.setProfissional(profissional);
+        ServiceLocator.getExecucaoService().create(execucao);
+
+        Profissional profissionalAtualizado = ServiceLocator.getProfissionalService().readById(profissional.getId());
+        setLoggedUser(session, profissionalAtualizado);
+
+        return "redirect:/servico/servicos";
     }
 
     @RequestMapping(value = "/servico/{id}/excluir", method = RequestMethod.GET)

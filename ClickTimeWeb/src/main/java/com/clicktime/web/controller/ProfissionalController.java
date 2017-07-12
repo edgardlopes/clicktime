@@ -52,37 +52,33 @@ public class ProfissionalController {
         fields.put(ProfissionalFields.HORA_FIM, horaFim);
         Map<String, String> errors = ServiceLocator.getProfissionalService().validateForCreate(fields);
 
-        if (errors.isEmpty()) {
-            Profissional profissional = new Profissional();
-            profissional.setNome(nome);
-            profissional.setSobrenome(sobrenome);
-            profissional.setNomeUsuario(nomeUsuario);
-            profissional.setEmail(email);
-            profissional.setTelefone(telefone);
-            profissional.setSenha(senha);
-            profissional.setDescricao(descricao);
-            profissional.setHoraInicio(CalendarioService.parseStringToDateTime(horaInicio, "HH:mm"));
-            profissional.setHoraFim(CalendarioService.parseStringToDateTime(horaFim, "HH:mm"));
-            ServiceLocator.getProfissionalService().create(profissional);
-
-            Avatar a = new Avatar();
-            if (avatar.isEmpty()) {
-                InputStream img = UsuarioController.class.getResourceAsStream("/client.png");
-                a.setImagem(IOUtils.toByteArray(img));
-            } else {
-                a.setImagem(avatar.getBytes());
-            }
-            ServiceLocator.getUsuarioService().setAvatar(profissional.getId(), a);
-
-            url = "redirect:/sucesso";
-        } else {
-            url = "/usuario/cadastro-usuario";
+        if (!errors.isEmpty()) {
             model.addAttribute("isProfissional", true);
             model.addAttribute("usuario", fields);
             model.addAttribute("errors", errors);
+            return "/usuario/cadastro-usuario";
+        }
+        
+        Profissional profissional = new Profissional();
+        profissional.setNome(nome);
+        profissional.setSobrenome(sobrenome);
+        profissional.setNomeUsuario(nomeUsuario);
+        profissional.setEmail(email);
+        profissional.setTelefone(telefone);
+        profissional.setSenha(senha);
+        profissional.setDescricao(descricao);
+        profissional.setHoraInicio(CalendarioService.parseStringToDateTime(horaInicio, "HH:mm"));
+        profissional.setHoraFim(CalendarioService.parseStringToDateTime(horaFim, "HH:mm"));
+        ServiceLocator.getProfissionalService().create(profissional);
+
+        if (!avatar.isEmpty()) {
+            Avatar a = new Avatar();
+            a.setImagem(avatar.getBytes());
+            ServiceLocator.getUsuarioService().setAvatar(profissional.getId(), a);
         }
 
-        return url;
+
+        return "redirect:/sucesso";
     }
 
     @RequestMapping(value = "/profissional/{urlProfissional}/home", method = RequestMethod.GET)
@@ -125,8 +121,13 @@ public class ProfissionalController {
     @RequestMapping(value = "/profissional/{id}/img.jpg", method = RequestMethod.GET)
     public void streamImagem(@PathVariable Long id, HttpServletResponse response) throws Exception {
         Avatar avatar = ServiceLocator.getUsuarioService().getAvatar(id);
+        if (avatar != null) {
+            response.getOutputStream().write(avatar.getImagem());
+        } else {
+            InputStream img = UsuarioController.class.getResourceAsStream("/client.png");
+            response.getOutputStream().write(IOUtils.toByteArray(img));
+        }
         response.setContentType("image/jpg");
-        response.getOutputStream().write(avatar.getImagem());
         response.flushBuffer();
     }
 }

@@ -34,7 +34,6 @@ public class UsuarioController {
         return "/usuario/escolha-tipo-usuario";
     }
 
-    //RM que trata os dados do login
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public String autentica(String email, String senha, HttpSession session, Model m) throws Exception {
         //u.setSenha(DigestUtils.md5Hex(u.getSenha()));
@@ -47,7 +46,6 @@ public class UsuarioController {
         }
 
         return "redirect:/";
-
     }
 
     //direciona o usuario para a home correta
@@ -77,7 +75,6 @@ public class UsuarioController {
     public String create(Model model, String nome, String sobrenome, String nomeUsuario,
             String email, String telefone, String senha, String senhaConfirm, MultipartFile avatar) throws Exception {
         //usuario.setSenha(DigestUtils.md5Hex(usuario.getSenha()));
-        String url = "";
         Map<String, Object> fields = new HashMap<>();
         fields.put(UsuarioFields.NOME, nome);
         fields.put(UsuarioFields.SOBRENOME, sobrenome);
@@ -90,33 +87,28 @@ public class UsuarioController {
         fields.put(UsuarioFields.SENHA, senha);
         fields.put(UsuarioFields.SENHA_CONFIRM, senhaConfirm);
         Map<String, String> errors = ServiceLocator.getUsuarioService().validateForCreate(fields);
-        if (errors.isEmpty()) {
-            Usuario usuario = new Usuario();
-            usuario.setNome(nome);
-            usuario.setSobrenome(sobrenome);
-            usuario.setNomeUsuario(nomeUsuario);
-            usuario.setEmail(email);
-            usuario.setTelefone(telefone);
-            usuario.setSenha(senha);
-            ServiceLocator.getUsuarioService().create(usuario);
-
-            Avatar a = new Avatar();
-            if (avatar.isEmpty()) {
-                InputStream img = UsuarioController.class.getResourceAsStream("/client.png");
-                a.setImagem(IOUtils.toByteArray(img));
-            } else {
-                a.setImagem(avatar.getBytes());
-            }
-            ServiceLocator.getUsuarioService().setAvatar(usuario.getId(), a);
-
-            url = "redirect:/sucesso";
-        } else {
+        if (!errors.isEmpty()) {
             model.addAttribute("errors", errors);
             model.addAttribute("usuario", fields);
-            url = "/usuario/cadastro-usuario";
+            return "/usuario/cadastro-usuario";
         }
 
-        return url;
+        Usuario usuario = new Usuario();
+        usuario.setNome(nome);
+        usuario.setSobrenome(sobrenome);
+        usuario.setNomeUsuario(nomeUsuario);
+        usuario.setEmail(email);
+        usuario.setTelefone(telefone);
+        usuario.setSenha(senha);
+        ServiceLocator.getUsuarioService().create(usuario);
+
+        if (!avatar.isEmpty()) {
+            Avatar a = new Avatar();
+            a.setImagem(avatar.getBytes());
+            ServiceLocator.getUsuarioService().setAvatar(usuario.getId(), a);
+        }
+
+        return "redirect:/sucesso";
     }
 
     //home cliente
@@ -166,7 +158,7 @@ public class UsuarioController {
             String nomeUsuario, String email, String telefone, String descricao,
             String horaInicio, String horaFim, Long id, MultipartFile avatar) throws Exception {
 
-        String url = "";
+        model.addAttribute("isUpdate", true);
 
         Map<String, Object> fields = new HashMap<>();
         fields.put(UsuarioFields.NOME, nome);
@@ -182,77 +174,75 @@ public class UsuarioController {
         Usuario usuarioLogado = getLoggedUser(session);
         if (usuarioLogado instanceof Profissional) {
             Map<String, String> errors = ServiceLocator.getProfissionalService().validateForUpdate(fields);
-            if (errors.isEmpty()) {
-                Profissional profissional = new Profissional();
-                profissional.setId(id);
-                profissional.setNome(nome);
-                profissional.setSobrenome(sobrenome);
-                profissional.setNomeUsuario(nomeUsuario);
-                profissional.setEmail(email);
-                profissional.setTelefone(telefone);
-                profissional.setDescricao(descricao);
-                profissional.setHoraInicio(CalendarioService.parseStringToDateTime(horaInicio, "HH:mm"));
-                profissional.setHoraFim(CalendarioService.parseStringToDateTime(horaFim, "HH:mm"));
-                ServiceLocator.getProfissionalService().update(profissional);
-                setLoggedUser(session, profissional);
-
-                Avatar a = new Avatar();
-                if (avatar.isEmpty()) {
-                    InputStream img = UsuarioController.class.getResourceAsStream("/com/clicktime/web/res/client.png");
-                    a.setImagem(IOUtils.toByteArray(img));
-                } else {
-                    a.setImagem(avatar.getBytes());
-                }
-                ServiceLocator.getUsuarioService().setAvatar(profissional.getId(), a);
-
-                url = "redirect:/home";
-            } else {
-                url = "/usuario/cadastro-usuario";
+            if (!errors.isEmpty()) {
                 model.addAttribute("errors", errors);
                 model.addAttribute("usuario", fields);
                 model.addAttribute("isProfissional", true);
+                return "/usuario/cadastro-usuario";
             }
-        } else {
-            Map<String, String> errors = ServiceLocator.getUsuarioService().validateForUpdate(fields);
-            if (errors.isEmpty()) {
-                Usuario usuario = new Usuario();
-                usuario.setId(id);
-                usuario.setNome(nome);
-                usuario.setSobrenome(sobrenome);
-                usuario.setNomeUsuario(nomeUsuario);
-                usuario.setEmail(email);
-                usuario.setTelefone(telefone);
-                ServiceLocator.getUsuarioService().update(usuario);
-                setLoggedUser(session, usuario);
 
+            Profissional profissional = new Profissional();
+            profissional.setId(id);
+            profissional.setNome(nome);
+            profissional.setSobrenome(sobrenome);
+            profissional.setNomeUsuario(nomeUsuario);
+            profissional.setEmail(email);
+            profissional.setTelefone(telefone);
+            profissional.setDescricao(descricao);
+            profissional.setHoraInicio(CalendarioService.parseStringToDateTime(horaInicio, "HH:mm"));
+            profissional.setHoraFim(CalendarioService.parseStringToDateTime(horaFim, "HH:mm"));
+            ServiceLocator.getProfissionalService().update(profissional);
+            setLoggedUser(session, profissional);
+
+            if (!avatar.isEmpty()) {
                 Avatar a = new Avatar();
-
-                if (avatar.isEmpty()) {
-                    InputStream img = UsuarioController.class.getResourceAsStream("/client.png");
-                    a.setImagem(IOUtils.toByteArray(img));
-                } else {
-                    a.setImagem(avatar.getBytes());
-                }
-                ServiceLocator.getUsuarioService().setAvatar(usuario.getId(), a);
-
-                url = "redirect:/home";
-            } else {
-                url = "/usuario/cadastro-usuario";
-                model.addAttribute("errors", errors);
-                model.addAttribute("usuario", fields);
+                a.setImagem(avatar.getBytes());
+                ServiceLocator.getUsuarioService().setAvatar(profissional.getId(), a);
             }
-        }
-        model.addAttribute("isUpdate", true);
 
-        return url;
+            return "redirect:/home";
+        }
+
+        Map<String, String> errors = ServiceLocator.getUsuarioService().validateForUpdate(fields);
+        if (!errors.isEmpty()) {
+            model.addAttribute("errors", errors);
+            model.addAttribute("usuario", fields);
+            return "/usuario/cadastro-usuario";
+        }
+        Usuario usuario = new Usuario();
+        usuario.setId(id);
+        usuario.setNome(nome);
+        usuario.setSobrenome(sobrenome);
+        usuario.setNomeUsuario(nomeUsuario);
+        usuario.setEmail(email);
+        usuario.setTelefone(telefone);
+        ServiceLocator.getUsuarioService().update(usuario);
+        setLoggedUser(session, usuario);
+
+        Avatar a = new Avatar();
+
+        if (avatar.isEmpty()) {
+            InputStream img = UsuarioController.class.getResourceAsStream("/client.png");
+            a.setImagem(IOUtils.toByteArray(img));
+        } else {
+            a.setImagem(avatar.getBytes());
+        }
+        ServiceLocator.getUsuarioService().setAvatar(usuario.getId(), a);
+
+        return "redirect:/home";
     }
 
     @RequestMapping(value = "/usuarioLogado/img.jpg", method = RequestMethod.GET)
     public void streamImagem(HttpSession session, HttpServletResponse response) throws Exception {
         Usuario usuario = getLoggedUser(session);
         Avatar avatar = ServiceLocator.getUsuarioService().getAvatar(usuario.getId());
+        if (avatar != null) {
+            response.getOutputStream().write(avatar.getImagem());
+        } else {
+            InputStream img = UsuarioController.class.getResourceAsStream("/client.png");
+            response.getOutputStream().write(IOUtils.toByteArray(img));
+        }
         response.setContentType("image/jpg");
-        response.getOutputStream().write(avatar.getImagem());
         response.flushBuffer();
     }
 

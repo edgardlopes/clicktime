@@ -30,7 +30,6 @@ public class SolicitacaoController {
 
     @RequestMapping(value = "/reservarHorario", method = RequestMethod.POST)
     public String reservarHorario(String execucaoID, String horarioSelecionado, HttpSession session, Model model) throws Exception {
-        String url = "";
         String[] aux = horarioSelecionado.split(", ");
         final Usuario usuarioLogado = getLoggedUser(session);
 
@@ -39,39 +38,36 @@ public class SolicitacaoController {
         HorarioAtendimento horaInicio = ServiceLocator.getHorarioAtendimentoService().readById(Long.parseLong(aux[0]));
         HorarioAtendimento horaFim = ServiceLocator.getHorarioAtendimentoService().readById(Long.parseLong(aux[aux.length - 1]));
 
-        if (!ServiceLocator.getSolicitacaoService().existsSolicitacao(Long.parseLong(execucaoID), clienteFK, dia.getId(), horaInicio.getHoraInicio(), horaFim.getHoraFim())) {
-            List<HorarioAtendimento> horarioAtendimentoList = new ArrayList<>();
-
-            for (String id : aux) {
-                HorarioAtendimento horarioAtendimento = new HorarioAtendimento();
-                horarioAtendimento.setId(Long.parseLong(id));
-                horarioAtendimentoList.add(horarioAtendimento);
-            }
-
-            Execucao execucao = new Execucao();
-            execucao.setId(Long.parseLong(execucaoID));
-
-            Solicitacao solicitacao = new Solicitacao();
-            solicitacao.setExecucao(execucao);
-            solicitacao.setHorarioAtendimentoList(horarioAtendimentoList);
-
-            solicitacao.setUsuario(usuarioLogado);
-
-            ServiceLocator.getSolicitacaoService().solicitarHorario(solicitacao);
-            solicitacao = ServiceLocator.getSolicitacaoService().readById(solicitacao.getId());
-            model.addAttribute("solicitacao", solicitacao);
-
-            url = "/solicitacao/cliente/sucesso";
-        } else {
-            url = "/solicitacao/ja-reservada";
+        if (ServiceLocator.getSolicitacaoService().existsSolicitacao(Long.parseLong(execucaoID), clienteFK, dia.getId(), horaInicio.getHoraInicio(), horaFim.getHoraFim())) {
+            return "/solicitacao/ja-reservada";
         }
-        return url;
+        
+        List<HorarioAtendimento> horarioAtendimentoList = new ArrayList<>();
+
+        for (String id : aux) {
+            HorarioAtendimento horarioAtendimento = new HorarioAtendimento();
+            horarioAtendimento.setId(Long.parseLong(id));
+            horarioAtendimentoList.add(horarioAtendimento);
+        }
+
+        Execucao execucao = new Execucao();
+        execucao.setId(Long.parseLong(execucaoID));
+
+        Solicitacao solicitacao = new Solicitacao();
+        solicitacao.setExecucao(execucao);
+        solicitacao.setHorarioAtendimentoList(horarioAtendimentoList);
+
+        solicitacao.setUsuario(usuarioLogado);
+
+        ServiceLocator.getSolicitacaoService().solicitarHorario(solicitacao);
+        solicitacao = ServiceLocator.getSolicitacaoService().readById(solicitacao.getId());
+        model.addAttribute("solicitacao", solicitacao);
+
+        return "/solicitacao/cliente/sucesso";
     }
 
     @RequestMapping(value = "/solicitacoes", method = RequestMethod.GET)
     public String list(HttpSession session, Model model, String dataInicio, String dataFim, String status, Integer pagina) throws Exception {
-        String url = "";
-
         if (pagina == null) {
             pagina = 1;
         }
@@ -116,18 +112,11 @@ public class SolicitacaoController {
         }
 
         Usuario usuario = getLoggedUser(session);
-//        solicitacaoList.get(0).getHorarioAtendimentoList().get(0).getDiaAtendimento().
-        if (usuario instanceof Profissional) {
-            criteria.put(SolicitacaoCriteria.PROFISSIONAL_FK_EQ, usuario.getId());
-            url = "/solicitacao/profissional/list";
-        } else {
-            criteria.put(SolicitacaoCriteria.CLIENTE_FK_EQ, usuario.getId());
-            model.addAttribute("profissionalFavorito", ServiceLocator.getUsuarioService().getProfissionalFavorito(usuario.getId()));
-            url = "/solicitacao/cliente/list";
-        }
-
+                
+        criteria.put(usuario instanceof Profissional ? 
+                SolicitacaoCriteria.PROFISSIONAL_FK_EQ : SolicitacaoCriteria.CLIENTE_FK_EQ, usuario.getId());
+        
         List<Solicitacao> solicitacaoList = ServiceLocator.getSolicitacaoService().readByCriteria(criteria, (pagina - 1) * SolicitacaoDAO.LIMIT);
-//                solicitacaoList = ServiceLocator.getSolicitacaoService().readByCriteria(criteria, null);
         Long count = ServiceLocator.getSolicitacaoService().countByCriteria(criteria);
         Integer paginas = Math.round(count.floatValue() / SolicitacaoDAO.LIMIT.floatValue());
         model.addAttribute("solicitacaoList", solicitacaoList);
@@ -136,7 +125,8 @@ public class SolicitacaoController {
 
         model.addAttribute("solicitacao", "active");
 
-        return url;
+        return usuario instanceof Profissional ? 
+                "/solicitacao/profissional/list" : "/solicitacao/cliente/list";
     }
 
     @RequestMapping(value = "/solicitacao/{id}/aceitar", method = RequestMethod.GET)

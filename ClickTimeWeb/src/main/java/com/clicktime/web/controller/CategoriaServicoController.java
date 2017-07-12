@@ -32,22 +32,21 @@ public class CategoriaServicoController {
 
     @RequestMapping(value = "/categoria/novo", method = RequestMethod.POST)
     public String create(String nome, Model model) throws Exception {
-        String url = "redirect:/servico/novo";
 
         Map<String, Object> fields = new HashMap<>();
         fields.put(CategoriaServicoFields.NOME, nome);
         Map<String, String> errors = ServiceLocator.getCategoriaServicoService().validateForCreate(fields);
-        if (errors.isEmpty()) {
-            CategoriaServico categoria = new CategoriaServico();
-            categoria.setNome(nome);
-            ServiceLocator.getCategoriaServicoService().create(categoria);
-        } else {
+        if (!errors.isEmpty()) {
             model.addAttribute("categoria", fields);
             model.addAttribute("errors", errors);
-            url = "/categoria/novo";
+            return "/categoria/novo";
         }
+        
+        CategoriaServico categoria = new CategoriaServico();
+        categoria.setNome(nome);
+        ServiceLocator.getCategoriaServicoService().create(categoria);
 
-        return url;
+        return "redirect:/servico/novo";
     }
 
     @RequestMapping(value = "/tipoServico/novo", method = RequestMethod.GET)
