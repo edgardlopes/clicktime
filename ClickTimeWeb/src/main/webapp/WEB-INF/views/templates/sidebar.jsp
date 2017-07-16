@@ -62,7 +62,7 @@
 		<c:if
 			test="${usuarioLogado['class'].name eq 'com.clicktime.model.entity.Profissional'}">
 
-			<li><a href="<c:url value="/servico/servicos" />"> <span
+			<li><a href="<c:url value="/servicos" />"> <span
 					class="glyphicon glyphicon-wrench"></span>Servicos
 			</a></li>
 			<li><a

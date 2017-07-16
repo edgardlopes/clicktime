@@ -3,21 +3,20 @@ package com.clicktime.model;
 import java.util.List;
 
 import com.clicktime.model.entity.CategoriaServico;
+import java.time.Month;
+import org.joda.time.Months;
 
 
 public class Teste {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		
-		try {
-			List<CategoriaServico> list = ServiceLocator.getCategoriaServicoService().readByCriteria(null, null);
-			list.forEach(c -> System.out.println(c.getNome()));
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+            final Month[] values = Month.values();
+            
+            for (Month value : values) {
+                System.out.println(value.name());
+                System.out.println(value.getValue());
+            }
+            
 	}
 
 }

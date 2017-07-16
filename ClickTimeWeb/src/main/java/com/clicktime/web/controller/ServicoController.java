@@ -31,14 +31,14 @@ public class ServicoController {
         return "servico/servico-option";
     }
 
-    @RequestMapping(value = "/servico/servicos", method = RequestMethod.GET)
+    @RequestMapping(value = "/servicos", method = RequestMethod.GET)
     public String servicos(Model model, HttpSession session) throws Exception {
         final Profissional profissional = (Profissional) getLoggedUser(session);
         List<Execucao> execucaoList = ServiceLocator.getExecucaoService().readByProfissional(profissional);
         model.addAttribute("execucaoList", execucaoList);
         model.addAttribute("isServicos", "active");
 
-        return "/servico/servico-list";
+        return "/servico/list";
     }
 
     @RequestMapping(value = "/servico/novo", method = RequestMethod.GET)

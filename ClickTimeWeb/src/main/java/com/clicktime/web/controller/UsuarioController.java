@@ -150,7 +150,7 @@ public class UsuarioController {
         model.addAttribute("usuario", usuario);
         model.addAttribute("isUpdate", true);
         model.addAttribute("minhaConta", "active");
-        return "/usuario/cadastro-usuario";
+        return "/usuario/update";
     }
 
     @RequestMapping(value = "/minhaConta", method = RequestMethod.POST)

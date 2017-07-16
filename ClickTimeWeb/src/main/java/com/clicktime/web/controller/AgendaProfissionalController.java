@@ -6,6 +6,7 @@ import com.clicktime.model.entity.HorarioAtendimento;
 import com.clicktime.model.entity.Profissional;
 import com.clicktime.model.service.calendario.CalendarioService;
 import static com.clicktime.web.interceptor.SessionUtils.*;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
@@ -26,6 +27,7 @@ public class AgendaProfissionalController {
     public String getAgenda(@PathVariable Integer year, Model m, HttpSession session) {
         m.addAttribute("idProfissional", ((Profissional) getLoggedUser(session)).getId());
         m.addAttribute("year", year);
+        m.addAttribute("months", Month.values());
         return "/agenda/months";
     }
 
