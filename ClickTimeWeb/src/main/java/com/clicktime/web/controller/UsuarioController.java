@@ -9,6 +9,7 @@ import com.clicktime.model.entity.Usuario;
 import com.clicktime.model.fields.ProfissionalFields;
 import com.clicktime.model.fields.UsuarioFields;
 import com.clicktime.model.service.calendario.CalendarioService;
+import com.clicktime.model.util.StringUtils;
 import static com.clicktime.web.interceptor.SessionUtils.*;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -80,9 +81,6 @@ public class UsuarioController {
         fields.put(UsuarioFields.SOBRENOME, sobrenome);
         fields.put(UsuarioFields.NOME_USUARIO, nomeUsuario);
         fields.put(UsuarioFields.EMAIL, email);
-        if (telefone == null || telefone.isEmpty()) {
-            telefone = null;
-        }
         fields.put(UsuarioFields.TELEFONE, telefone);
         fields.put(UsuarioFields.SENHA, senha);
         fields.put(UsuarioFields.SENHA_CONFIRM, senhaConfirm);
@@ -118,8 +116,7 @@ public class UsuarioController {
 
         Map<String, Object> criteria = new HashMap<>();
         criteria.put(SolicitacaoCriteria.CLIENTE_FK_EQ, usuario.getId());
-        DateTime now = new DateTime();
-        now = now.minusDays(1);
+        DateTime now = new DateTime().minusDays(1);
         criteria.put(SolicitacaoCriteria.DIA_ATENDIMENTO_LE, new DateTime(now.getYear(), now.getMonthOfYear(), now.getDayOfMonth(), 1, 1));
         criteria.put(SolicitacaoCriteria.STATUS_EQ, Solicitacao.SOLICITACAO_ACEITA);
         criteria.put(SolicitacaoCriteria.IS_AVALIACAO, true);

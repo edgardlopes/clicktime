@@ -7,6 +7,7 @@ import com.clicktime.model.entity.HorarioAtendimento;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,42 +17,33 @@ import org.joda.time.DateTime;
 public class HorarioAtendimentoDAO implements BaseDAO<HorarioAtendimento> {
 
     @Override
-    public void create(Connection conn, HorarioAtendimento e) throws Exception {
+    public void create(Connection conn, HorarioAtendimento e) throws SQLException {
         String sql = "INSERT INTO horario_atendimento(dia_atendimento_fk, hora_inicio, hora_fim, status) VALUES (?, ?, ?, ?) RETURNING id, status;";
 
-        try {
-            PreparedStatement ps = conn.prepareStatement(sql);
+        PreparedStatement ps = conn.prepareStatement(sql);
 
-            ps.setLong(1, e.getDiaAtendimento().getId());
+        ps.setLong(1, e.getDiaAtendimento().getId());
 
-            Time horaInicio = new Time(e.getHoraInicio().getMillis());
-            ps.setTime(2, horaInicio);
+        Time horaInicio = new Time(e.getHoraInicio().getMillis());
+        ps.setTime(2, horaInicio);
 
-            Time horaFim = new Time(e.getHoraFim().getMillis());
-            ps.setTime(3, horaFim);
+        Time horaFim = new Time(e.getHoraFim().getMillis());
+        ps.setTime(3, horaFim);
 
-            if (e.getStatus() != null && !e.getStatus().isEmpty()) {
-                ps.setString(4, e.getStatus());
-            } else {
-                ps.setString(4, "B");
-            }
+        ps.setString(4, e.getStatus());
 
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                e.setId(rs.getLong("id"));
-                e.setStatus(rs.getString("status"));
-            }
-            rs.close();
-            ps.close();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            throw ex;
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            e.setId(rs.getLong("id"));
+            e.setStatus(rs.getString("status"));
         }
+        rs.close();
+        ps.close();
 
     }
 
     @Override
-    public HorarioAtendimento readById(Connection conn, Long id) throws Exception {
+    public HorarioAtendimento readById(Connection conn, Long id) throws SQLException {
         String sql = "SELECT * FROM horario_atendimento where id=?";
         PreparedStatement ps = conn.prepareStatement(sql);
         ps.setLong(1, id);
@@ -64,7 +56,7 @@ public class HorarioAtendimentoDAO implements BaseDAO<HorarioAtendimento> {
             horario.setStatus(rs.getString("status"));
             horario.setHoraFim(new DateTime(rs.getTime("hora_fim").getTime()));
             horario.setHoraInicio(new DateTime(rs.getTime("hora_inicio").getTime()));
-            
+
             DiaAtendimento diaAtendimento = new DiaAtendimento();
             diaAtendimento.setId(rs.getLong("dia_atendimento_fk"));
             horario.setDiaAtendimento(diaAtendimento);
@@ -74,7 +66,7 @@ public class HorarioAtendimentoDAO implements BaseDAO<HorarioAtendimento> {
     }
 
     @Override
-    public List<HorarioAtendimento> readByCriteria(Connection conn, Map<String, Object> criteria, Integer offset) throws Exception {
+    public List<HorarioAtendimento> readByCriteria(Connection conn, Map<String, Object> criteria, Integer offset) throws SQLException {
         String sql = "SELECT * from horario_atendimento ha left join solicitacao_horario_atendimento sha on sha.horario_atendimento_fk=ha.id where 1=1 ";
 
         if (criteria != null && criteria.size() > 0) {
@@ -95,7 +87,7 @@ public class HorarioAtendimentoDAO implements BaseDAO<HorarioAtendimento> {
 
         ResultSet rs = ps.executeQuery();
 
-        List<HorarioAtendimento> horarioAtendimentoList = new ArrayList<HorarioAtendimento>();
+        List<HorarioAtendimento> horarioAtendimentoList = new ArrayList<>();
         while (rs.next()) {
             HorarioAtendimento h = new HorarioAtendimento();
             h.setId(rs.getLong("id"));
@@ -120,7 +112,7 @@ public class HorarioAtendimentoDAO implements BaseDAO<HorarioAtendimento> {
     }
 
     @Override
-    public void update(Connection conn, HorarioAtendimento e) throws Exception {
+    public void update(Connection conn, HorarioAtendimento e) throws SQLException {
         String sql = "UPDATE horario_atendimento SET status=? WHERE id=?";
 
         PreparedStatement ps = conn.prepareStatement(sql);
@@ -133,11 +125,11 @@ public class HorarioAtendimentoDAO implements BaseDAO<HorarioAtendimento> {
     }
 
     @Override
-    public void delete(Connection conn, Long id) throws Exception {
+    public void delete(Connection conn, Long id) throws SQLException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    public List<HorarioAtendimento> readByCriteriaCliente(Connection conn, Map<String, Object> criteria, Integer offset) throws Exception {
+    public List<HorarioAtendimento> readByCriteriaCliente(Connection conn, Map<String, Object> criteria, Integer offset) throws SQLException {
         String sql = "SELECT * from horario_atendimento ha where 1=1 ";
 
         if (criteria != null && criteria.size() > 0) {
@@ -153,7 +145,7 @@ public class HorarioAtendimentoDAO implements BaseDAO<HorarioAtendimento> {
 
         ResultSet rs = ps.executeQuery();
 
-        List<HorarioAtendimento> horarioAtendimentoList = new ArrayList<HorarioAtendimento>();
+        List<HorarioAtendimento> horarioAtendimentoList = new ArrayList<>();
         while (rs.next()) {
             HorarioAtendimento h = new HorarioAtendimento();
             h.setId(rs.getLong("id"));

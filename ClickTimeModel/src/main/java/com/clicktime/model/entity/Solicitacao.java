@@ -72,7 +72,10 @@ public class Solicitacao extends BaseEntity {
         return pontos;
     }
     
-    
+    public void cancelar(){
+        setStatus(Solicitacao.SOLICITACAO_REJEITADA);
+        setDescricao("Cancelado devido a sobreposição de horários.");
+    }
     
     @Override
     public int hashCode() {

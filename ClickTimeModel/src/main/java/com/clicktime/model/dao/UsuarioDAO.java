@@ -8,6 +8,7 @@ import com.clicktime.model.entity.Usuario;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,34 +18,29 @@ import org.joda.time.DateTime;
 public class UsuarioDAO implements BaseDAO<Usuario> {
 
     @Override
-    public void create(Connection conn, Usuario e) throws Exception {
+    public void create(Connection conn, Usuario e) throws SQLException {
         String sql = "INSERT INTO usuario (nome, sobrenome, nome_usuario, email, telefone, senha) VALUES (?, ?, ?, ?, ?, ?) RETURNING id;";
 
-        try {
-            PreparedStatement ps = conn.prepareStatement(sql);
-            int i = 1;
-            ps.setString(i++, e.getNome());
-            ps.setString(i++, e.getSobrenome());
-            ps.setString(i++, e.getNomeUsuario());
-            ps.setString(i++, e.getEmail());
-            ps.setString(i++, e.getTelefone());
-            ps.setString(i++, e.getSenha());
+        PreparedStatement ps = conn.prepareStatement(sql);
+        int i = 1;
+        ps.setString(i++, e.getNome());
+        ps.setString(i++, e.getSobrenome());
+        ps.setString(i++, e.getNomeUsuario());
+        ps.setString(i++, e.getEmail());
+        ps.setString(i++, e.getTelefone());
+        ps.setString(i++, e.getSenha());
 
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                e.setId(rs.getLong("id"));
-            }
-            rs.close();
-            ps.close();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            throw ex;
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            e.setId(rs.getLong("id"));
         }
+        rs.close();
+        ps.close();
 
     }
 
     @Override
-    public Usuario readById(Connection conn, Long id) throws Exception {
+    public Usuario readById(Connection conn, Long id) throws SQLException {
         String sql = "SELECT * from usuario where id=?";
         PreparedStatement ps = conn.prepareStatement(sql);
         ps.setLong(1, id);
@@ -66,7 +62,7 @@ public class UsuarioDAO implements BaseDAO<Usuario> {
     }
 
     @Override
-    public List<Usuario> readByCriteria(Connection conn, Map<String, Object> criteria, Integer offset) throws Exception {
+    public List<Usuario> readByCriteria(Connection conn, Map<String, Object> criteria, Integer offset) throws SQLException {
         String sql = "SELECT * from usuario where 1=1";
 
         if (criteria != null && !criteria.isEmpty()) {
@@ -120,7 +116,7 @@ public class UsuarioDAO implements BaseDAO<Usuario> {
     }
 
     @Override
-    public void update(Connection conn, Usuario e) throws Exception {
+    public void update(Connection conn, Usuario e) throws SQLException {
         String sql = "UPDATE usuario SET nome=?, sobrenome=?, nome_usuario=?, email=?, telefone=? WHERE id=?";
         PreparedStatement ps = conn.prepareStatement(sql);
         int i = 1;
@@ -136,11 +132,11 @@ public class UsuarioDAO implements BaseDAO<Usuario> {
     }
 
     @Override
-    public void delete(Connection conn, Long id) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void delete(Connection conn, Long id) throws SQLException {
+        throw new UnsupportedOperationException();
     }
 
-    public void setAvatar(Connection conn, Long id, Avatar avatar) throws Exception {
+    public void setAvatar(Connection conn, Long id, Avatar avatar) throws SQLException {
         String sql = "DELETE FROM usuario_avatar WHERE usuario_fk=?";
         PreparedStatement ps = conn.prepareStatement(sql);
         ps.setLong(1, id);
@@ -154,7 +150,7 @@ public class UsuarioDAO implements BaseDAO<Usuario> {
         ps.close();
     }
 
-    public Avatar getAvatar(Connection conn, Long id) throws Exception {
+    public Avatar getAvatar(Connection conn, Long id) throws SQLException {
         Avatar avatar = null;
         String sql = "SELECT * FROM usuario_avatar WHERE usuario_fk=?";
         PreparedStatement ps = conn.prepareStatement(sql);
@@ -169,7 +165,7 @@ public class UsuarioDAO implements BaseDAO<Usuario> {
         return avatar;
     }
 
-    public Profissional getProfissionalFavorito(Connection conn, Long id) throws Exception {
+    public Profissional getProfissionalFavorito(Connection conn, Long id) throws SQLException {
         String sql = "SELECT p.*, u.*, count(*) from solicitacao s \n"
                 + "left join execucao_servico ex on ex.id=s.execucao_servico_fk\n"
                 + "left join profissional p on ex.profissional_fk=p.usuario_fk\n"

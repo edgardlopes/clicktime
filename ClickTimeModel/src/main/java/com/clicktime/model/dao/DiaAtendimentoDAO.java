@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,7 @@ public class DiaAtendimentoDAO implements BaseDAO<DiaAtendimento> {
     
 
     @Override
-    public void create(Connection conn, DiaAtendimento e) throws Exception {
+    public void create(Connection conn, DiaAtendimento e) throws SQLException {
         String sql = "INSERT INTO dia_atendimento(profissional_fk, data_at) VALUES (?, ?) RETURNING id;";
 
         PreparedStatement ps = conn.prepareStatement(sql);
@@ -39,7 +40,7 @@ public class DiaAtendimentoDAO implements BaseDAO<DiaAtendimento> {
     }
 
     @Override
-    public DiaAtendimento readById(Connection conn, Long id) throws Exception {
+    public DiaAtendimento readById(Connection conn, Long id) throws SQLException {
         String sql = "SELECT da.data_at, da.id dia_atendimento_fk, p.*, u.* from dia_atendimento da left join profissional p on da.profissional_fk=p.usuario_fk left join usuario u on p.usuario_fk=u.id where da.id=?";
         PreparedStatement ps = conn.prepareStatement(sql);
         ps.setLong(1, id);
@@ -69,7 +70,7 @@ public class DiaAtendimentoDAO implements BaseDAO<DiaAtendimento> {
     }
 
     @Override
-    public List<DiaAtendimento> readByCriteria(Connection conn, Map<String, Object> criteria, Integer offset) throws Exception {
+    public List<DiaAtendimento> readByCriteria(Connection conn, Map<String, Object> criteria, Integer offset) throws SQLException {
         String sql = "  SELECT  * FROM dia_atendimento WHERE 1=1 ";
 
         if (criteria != null && !criteria.isEmpty()) {
@@ -110,12 +111,12 @@ public class DiaAtendimentoDAO implements BaseDAO<DiaAtendimento> {
     }
 
     @Override
-    public void update(Connection conn, DiaAtendimento e) throws Exception {
+    public void update(Connection conn, DiaAtendimento e) throws SQLException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void delete(Connection conn, Long id) throws Exception {
+    public void delete(Connection conn, Long id) throws SQLException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

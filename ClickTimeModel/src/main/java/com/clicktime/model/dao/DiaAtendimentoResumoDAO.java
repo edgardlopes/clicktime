@@ -6,13 +6,14 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import org.joda.time.DateTime;
 
 public class DiaAtendimentoResumoDAO {
 
-    public List<DiaAtendimentoResumo> readByReportOfMonth(Connection conn, DiaAtendimento da) throws Exception {
+    public List<DiaAtendimentoResumo> readByReportOfMonth(Connection conn, DiaAtendimento da) throws SQLException {
         String sql = "select data_at, profissional_fk, sum(livre) as qtde_livre, sum(bloqueado) as qtde_bloqueado from "
                 + "(select data_at, profissional_fk,  "
                 + "case when upper(status) ilike 'l' then count(status) else 0 end as livre, "
@@ -37,7 +38,7 @@ public class DiaAtendimentoResumoDAO {
 
         ResultSet rs = ps.executeQuery();
 
-        List<DiaAtendimentoResumo> resumoList = new ArrayList<DiaAtendimentoResumo>();
+        List<DiaAtendimentoResumo> resumoList = new ArrayList<>();
         while (rs.next()) {
             DiaAtendimentoResumo resumo = new DiaAtendimentoResumo();
 

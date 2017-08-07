@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +20,7 @@ import org.joda.time.DateTime;
 public class ExecucaoDAO implements BaseDAO<Execucao> {
 
     @Override
-    public void create(Connection conn, Execucao e) throws Exception {
+    public void create(Connection conn, Execucao e) throws SQLException {
         String sql = "INSERT INTO execucao_servico(profissional_fk, servico_fk, descricao, duracao, valor, ativo) VALUES (?, ?, ?, ?, ?, ?) RETURNING id;";
 
         PreparedStatement ps = conn.prepareStatement(sql);
@@ -42,7 +43,7 @@ public class ExecucaoDAO implements BaseDAO<Execucao> {
     }
 
     @Override
-    public Execucao readById(Connection conn, Long id) throws Exception {
+    public Execucao readById(Connection conn, Long id) throws SQLException {
         String sql = "SELECT ex.*, s.nome as servico_nome, s.id,  cs.id categoria_fk, cs.nome categoria_nome from execucao_servico as ex  "
                 + "left JOIN servico as s on ex.servico_fk=s.id "
                 + "left join categoria_servico cs on cs.id=s.categoria_servico_fk "
@@ -80,7 +81,7 @@ public class ExecucaoDAO implements BaseDAO<Execucao> {
     }
 
     @Override
-    public List<Execucao> readByCriteria(Connection conn, Map<String, Object> criteria, Integer offset) throws Exception {
+    public List<Execucao> readByCriteria(Connection conn, Map<String, Object> criteria, Integer offset) throws SQLException {
         String sql = "SELECT ex.*, s.nome as nome_servico,  p.descricao as profissional_descricao, p.hora_inicio, p.hora_fim, u.nome as usuario_nome, sobrenome, nome_usuario, email, telefone FROM execucao_servico as ex "
                 + "join profissional as p on ex.profissional_fk=p.usuario_fk "
                 + "LEFT JOIN servico as s ON s.id = ex.servico_fk "
@@ -93,8 +94,8 @@ public class ExecucaoDAO implements BaseDAO<Execucao> {
 
         PreparedStatement ps = conn.prepareStatement(sql);
         ResultSet rs = ps.executeQuery();
-        List<Execucao> execucaoList = new ArrayList<Execucao>();
 
+        List<Execucao> execucaoList = new ArrayList<>();
         Profissional p = null;
         while (rs.next()) {
             Execucao e = new Execucao();
@@ -141,7 +142,7 @@ public class ExecucaoDAO implements BaseDAO<Execucao> {
     }
 
     @Override
-    public void update(Connection conn, Execucao e) throws Exception {
+    public void update(Connection conn, Execucao e) throws SQLException {
         String sql = "UPDATE execucao_servico  SET descricao=?, duracao=?, valor=? WHERE id=?;";
         PreparedStatement ps = conn.prepareStatement(sql);
         ps.setString(1, e.getDescricao());
@@ -154,7 +155,7 @@ public class ExecucaoDAO implements BaseDAO<Execucao> {
     }
 
     @Override
-    public void delete(Connection conn, Long id) throws Exception {
+    public void delete(Connection conn, Long id) throws SQLException {
         //verificar
         String sql = "UPDATE execucao_servico SET ativo=? where id=?";
         
@@ -166,7 +167,7 @@ public class ExecucaoDAO implements BaseDAO<Execucao> {
         ps.close();
     }
 
-    public void updateUnidadeTempo(DateTime duracao, Long profissionalFK, Connection conn) throws Exception {
+    public void updateUnidadeTempo(DateTime duracao, Long profissionalFK, Connection conn) throws SQLException {
         String sql = "UPDATE profissional SET unidade_tempo=? where usuario_fk=?";
 
         PreparedStatement ps = conn.prepareStatement(sql);

@@ -9,7 +9,8 @@
         <title>Home | ClickTime - Serviço para agendamentos</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link href="<c:url value="/css/bootstrap.min.css"/>" rel="stylesheet">
+        <!--<link href="<c:url value="/css/bootstrap.min.css"/>" rel="stylesheet">-->
+        <link href="/ClickTimeWeb/css/bootstrap.min.css" rel="stylesheet">
         <link href="<c:url value="/css/ajustes.css"/>" rel="stylesheet">
         <link href="<c:url value="/css/bootstrap-datetimepicker.css"/>" rel="stylesheet">
 

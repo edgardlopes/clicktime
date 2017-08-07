@@ -20,9 +20,9 @@
                     </p>
                     <p>
                         <strong>Horário: </strong>
-                        <joda:format pattern="HH:mm" value="${solicitacao.horarioAtendimentoList[0].horaInicio}"/>
+                        <t:time time="${solicitacao.horarioAtendimentoList[0].horaInicio}"/>
                         -
-                        <joda:format pattern="HH:mm" value="${solicitacao.horarioAtendimentoList[0].horaFim}"/>
+                        <t:time time="${solicitacao.horarioAtendimentoList[0].horaFim}"/>
                     </p>
 
                     <joda:format pattern="yyyy/MM" value="${solicitacao.horarioAtendimentoList[0].diaAtendimento.data}" var="anoMes"/>

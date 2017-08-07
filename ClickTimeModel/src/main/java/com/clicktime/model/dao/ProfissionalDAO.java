@@ -6,6 +6,7 @@ import com.clicktime.model.entity.Profissional;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,31 +16,26 @@ import org.joda.time.DateTime;
 public class ProfissionalDAO implements BaseDAO<Profissional> {
 
     @Override
-    public void create(Connection conn, Profissional e) throws Exception {
+    public void create(Connection conn, Profissional e) throws SQLException {
         String sql = "INSERT INTO profissional(usuario_fk, descricao, hora_inicio, hora_fim) VALUES (?, ?, ?, ?);";
 
-        try {
-            PreparedStatement ps = conn.prepareStatement(sql);
-            int i = 1;
-            ps.setLong(i++, e.getId());
-            ps.setString(i++, e.getDescricao());
+        PreparedStatement ps = conn.prepareStatement(sql);
+        int i = 1;
+        ps.setLong(i++, e.getId());
+        ps.setString(i++, e.getDescricao());
 
-            Time t = new Time(e.getHoraInicio().getMillis());
-            ps.setTime(i++, t);
+        Time t = new Time(e.getHoraInicio().getMillis());
+        ps.setTime(i++, t);
 
-            t = new Time(e.getHoraFim().getMillis());
-            ps.setTime(i++, t);
+        t = new Time(e.getHoraFim().getMillis());
+        ps.setTime(i++, t);
 
-            ps.execute();
-            ps.close();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            throw ex;
-        }
+        ps.execute();
+        ps.close();
     }
 
     @Override
-    public Profissional readById(Connection conn, Long id) throws Exception {
+    public Profissional readById(Connection conn, Long id) throws SQLException {
         String sql = "SELECT * from usuario u join profissional p on u.id=p.usuario_fk where id=?";
 
         PreparedStatement ps = conn.prepareStatement(sql);
@@ -68,7 +64,7 @@ public class ProfissionalDAO implements BaseDAO<Profissional> {
     }
 
     @Override
-    public List<Profissional> readByCriteria(Connection conn, Map<String, Object> criteria, Integer offset) throws Exception {
+    public List<Profissional> readByCriteria(Connection conn, Map<String, Object> criteria, Integer offset) throws SQLException {
         String sql = "SELECT  distinct p.*, u.* from profissional p "
                 + "left join usuario u on u.id=p.usuario_fk "
                 + "left join execucao_servico ex on p.usuario_fk=ex.profissional_fk "
@@ -121,7 +117,7 @@ public class ProfissionalDAO implements BaseDAO<Profissional> {
 
             p.setUnidadeTempo(new DateTime(rs.getTime("unidade_tempo").getTime()));
             p.setPontos(getMediaPontos(conn, p.getId()));
-            
+
             profissionalList.add(p);
         }
         rs.close();
@@ -131,7 +127,7 @@ public class ProfissionalDAO implements BaseDAO<Profissional> {
     }
 
     @Override
-    public void update(Connection conn, Profissional e) throws Exception {
+    public void update(Connection conn, Profissional e) throws SQLException {
         String sql = "UPDATE profissional SET descricao=?, hora_inicio=?, hora_fim=? WHERE usuario_fk=?";
         PreparedStatement ps = conn.prepareStatement(sql);
         int i = 1;
@@ -144,11 +140,11 @@ public class ProfissionalDAO implements BaseDAO<Profissional> {
     }
 
     @Override
-    public void delete(Connection conn, Long id) throws Exception {
+    public void delete(Connection conn, Long id) throws SQLException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    public Float getMediaPontos(Connection conn, Long id) throws Exception {
+    public Float getMediaPontos(Connection conn, Long id) throws SQLException {
         String sql = "SELECT avg(pontos) pontos from solicitacao s \n"
                 + "left join execucao_servico ex on ex.id=s.execucao_servico_fk\n"
                 + "left join profissional p on ex.profissional_fk=p.usuario_fk\n"

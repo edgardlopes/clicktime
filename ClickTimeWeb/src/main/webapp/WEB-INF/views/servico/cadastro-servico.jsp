@@ -1,5 +1,4 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@taglib prefix="joda" uri="http://www.joda.org/joda/time/tags"%>
 <%@taglib prefix="t" tagdir="/WEB-INF/tags/"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <link href="<c:url value="/css/bootstrap-datetimepicker.css"/>" rel="stylesheet">
@@ -26,7 +25,7 @@
 
                     <div class="form-group col-lg-6 col-sm-6">
                         <label for="duracao" class="hidden-xs control-label">Duracao</label>
-                        <input type="text" class="form-control time form-servico campoDuracao" id="duracao" name="duracao" placeholder="hh:mm" value="<joda:format pattern="HH:mm" value="${execucao.duracao}"/>">
+                        <input type="text" class="form-control time form-servico campoDuracao" id="duracao" name="duracao" placeholder="hh:mm" value="<t:time time="${execucao.duracao}"/>">
                     <c:if test="${errors.duracao != null}"><p class="text-danger">${errors.duracao}</p></c:if>
                     </div>
 

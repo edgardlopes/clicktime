@@ -1,9 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@taglib prefix="joda" uri="http://www.joda.org/joda/time/tags" %>
 <%@taglib prefix="t" tagdir="/WEB-INF/tags/" %>
-<%@page import="org.joda.time.DateTime"%>
-<%@page import="org.joda.time.JodaTimePermission"%>
-<jsp:useBean id="now" class="org.joda.time.DateTime" />
 
 
 <t:wrapper>
@@ -13,7 +9,7 @@
         <c:set var="profissionalURL" value="/${profissional.nomeUsuario}"/>
 
         <div>${execucao.servico.nome}</div>
-        <div><joda:format pattern="HH:mm" value="${execucao.duracao}" /></div>
+        <div><t:time time="${execucao.duracao}"/></div>
         <c:set var="complementoURL" value="?servicoID=${execucao.id}"/>
     </c:if>
     <c:forEach var="month" items="${months}">

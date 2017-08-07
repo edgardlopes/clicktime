@@ -12,6 +12,7 @@ import com.clicktime.model.entity.Usuario;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ public class SolicitacaoDAO implements BaseDAO<Solicitacao> {
     public static final Integer LIMIT = 10;
 
     @Override
-    public void create(Connection conn, Solicitacao e) throws Exception {
+    public void create(Connection conn, Solicitacao e) throws SQLException {
         String sql = "INSERT INTO solicitacao(usuario_fk, execucao_servico_fk, status) VALUES (?, ?, ?) RETURNING id;";
 
         PreparedStatement ps = conn.prepareStatement(sql);
@@ -44,7 +45,7 @@ public class SolicitacaoDAO implements BaseDAO<Solicitacao> {
     }
 
     @Override
-    public Solicitacao readById(Connection conn, Long id) throws Exception {
+    public Solicitacao readById(Connection conn, Long id) throws SQLException {
         String sql = "SELECT s.id solicitacao_fk, s.descricao solicitacao_descricao , s.status solicitacao_status, "
                 + "     es.id execucao_fk, es.servico_fk servico_fk, es.descricao execucao_descricao, es.duracao execucao_duracao, es.valor execucao_valor, ser.nome servico_nome, "
                 + "     up.nome profissional_nome, up.sobrenome profissional_sobrenome, up.nome_usuario profissional_nome_usuario ,up.email profissional_email, up.telefone profissional_telefone, "
@@ -129,7 +130,7 @@ public class SolicitacaoDAO implements BaseDAO<Solicitacao> {
     }
 
     @Override
-    public List<Solicitacao> readByCriteria(Connection conn, Map<String, Object> criteria, Integer offset) throws Exception {
+    public List<Solicitacao> readByCriteria(Connection conn, Map<String, Object> criteria, Integer offset) throws SQLException {
         String sql = "SELECT s.id solicitacao_fk, pontos, s.descricao solicitacao_descricao ,s.status solicitacao_status, "
                 + "     es.id execucao_fk, es.servico_fk servico_fk, es.descricao execucao_descricao, es.duracao execucao_duracao, es.valor execucao_valor, ser.nome servico_nome, "
                 + "     up.nome profissional_nome, up.sobrenome profissional_sobrenome, up.nome_usuario profissional_nome_usuario ,up.email profissional_email, up.telefone profissional_telefone, "
@@ -247,7 +248,7 @@ public class SolicitacaoDAO implements BaseDAO<Solicitacao> {
         return solicitacaoList;
     }
 
-    public List<Solicitacao> readByCriteriaSemPaginacao(Connection conn, Map<String, Object> criteria) throws Exception {
+    public List<Solicitacao> readByCriteriaSemPaginacao(Connection conn, Map<String, Object> criteria) throws SQLException {
         String sql = "SELECT s.id solicitacao_fk, pontos, s.descricao solicitacao_descricao ,s.status solicitacao_status, "
                 + "     es.id execucao_fk, es.servico_fk servico_fk, es.descricao execucao_descricao, es.duracao execucao_duracao, es.valor execucao_valor, ser.nome servico_nome, "
                 + "     up.nome profissional_nome, up.sobrenome profissional_sobrenome, up.nome_usuario profissional_nome_usuario ,up.email profissional_email, up.telefone profissional_telefone, "
@@ -368,7 +369,7 @@ public class SolicitacaoDAO implements BaseDAO<Solicitacao> {
     }
 
     @Override
-    public void update(Connection conn, Solicitacao e) throws Exception {
+    public void update(Connection conn, Solicitacao e) throws SQLException {
         String sql = "UPDATE solicitacao SET status=?, descricao=? WHERE id=?";
         PreparedStatement ps = conn.prepareStatement(sql);
         ps.setString(1, e.getStatus());
@@ -380,7 +381,7 @@ public class SolicitacaoDAO implements BaseDAO<Solicitacao> {
     }
 
     @Override
-    public void delete(Connection conn, Long id) throws Exception {
+    public void delete(Connection conn, Long id) throws SQLException {
         String sql = "DELETE FROM solicitacao WHERE id=?";
         PreparedStatement ps = conn.prepareStatement(sql);
         ps.setLong(1, id);
@@ -388,7 +389,7 @@ public class SolicitacaoDAO implements BaseDAO<Solicitacao> {
         ps.close();
     }
 
-    private void updateHorarioAtendimentoList(Connection conn, Solicitacao e) throws Exception {
+    private void updateHorarioAtendimentoList(Connection conn, Solicitacao e) throws SQLException {
         String sql = "DELETE FROM solicitacao_horario_atendimento WHERE solicitacao_fk=?";
         PreparedStatement ps = conn.prepareStatement(sql);
         ps.setLong(1, e.getId());
@@ -405,7 +406,7 @@ public class SolicitacaoDAO implements BaseDAO<Solicitacao> {
         ps.close();
     }
 
-    public List<Solicitacao> getSolicitacoesACancelar(Connection connection, Long id, Long diaAtendimentoFK) throws Exception {
+    public List<Solicitacao> getSolicitacoesACancelar(Connection connection, Long id, Long diaAtendimentoFK) throws SQLException {
         String sql = "Select * from\n"
                 + "\n"
                 + "(SELECT\n"
@@ -528,7 +529,7 @@ public class SolicitacaoDAO implements BaseDAO<Solicitacao> {
         return solicitacaoList;
     }
 
-    public Long counByCriteria(Connection conn, Map<String, Object> criteria) throws Exception {
+    public Long counByCriteria(Connection conn, Map<String, Object> criteria) throws SQLException {
         String sql = "SELECT count(distinct s.id) total "
                 + "from solicitacao s  "
                 + "left join solicitacao_horario_atendimento sh on sh.solicitacao_fk=s.id "
@@ -578,7 +579,7 @@ public class SolicitacaoDAO implements BaseDAO<Solicitacao> {
         return count;
     }
 
-    public DiaAtendimento getDiaAtendimentoFromSolicitacao(Connection connection, Long id) throws Exception {
+    public DiaAtendimento getDiaAtendimentoFromSolicitacao(Connection connection, Long id) throws SQLException {
         String sql = "SELECT da.* from solicitacao s \n"
                 + "left join solicitacao_horario_atendimento sha on sha.solicitacao_fk=s.id\n"
                 + "left join horario_atendimento ha on ha.id=sha.horario_atendimento_fk\n"
@@ -603,12 +604,12 @@ public class SolicitacaoDAO implements BaseDAO<Solicitacao> {
         return diaAtendimento;
     }
 
-    public void remarcarSolicitacao(Connection connection, Solicitacao e) throws Exception {
+    public void remarcarSolicitacao(Connection connection, Solicitacao e) throws SQLException {
         update(connection, e);
         updateHorarioAtendimentoList(connection, e);
     }
 
-    public boolean existsSolicitacao(Connection conn, Long execucaoFK, Long clienteFK, Long diaAtendimentoFK, DateTime horaInicio, DateTime horaFim) throws Exception {
+    public boolean existsSolicitacao(Connection conn, Long execucaoFK, Long clienteFK, Long diaAtendimentoFK, DateTime horaInicio, DateTime horaFim) throws SQLException {
         String sql = "SELECT 	s.id solicitacao_fk, 	\n"
                 + "	es.id execucao_fk,\n"
                 + "	s.usuario_fk cliente_fk,\n"
@@ -644,7 +645,7 @@ public class SolicitacaoDAO implements BaseDAO<Solicitacao> {
         return existe;
     }
 
-    public Solicitacao getSolicitacaoFromHorarioAtendimentoId(Connection conn, Long horarioAtendimentoId, String status) throws Exception {
+    public Solicitacao getSolicitacaoFromHorarioAtendimentoId(Connection conn, Long horarioAtendimentoId, String status) throws SQLException {
         String sql = "select servico.nome servico_nome, usuario.nome usuario_nome from horario_atendimento ha \n"
                 + "left join solicitacao_horario_atendimento sha on ha.id=sha.horario_atendimento_fk\n"
                 + "left join solicitacao s on s.id=sha.solicitacao_fk\n"
@@ -677,7 +678,7 @@ public class SolicitacaoDAO implements BaseDAO<Solicitacao> {
         return solicitacao;
     }
 
-    public void avaliar(Connection conn, Long id, Float score) throws Exception {
+    public void avaliar(Connection conn, Long id, Float score) throws SQLException {
         String sql = "INSERT INTO solicitacao_avaliacao(solicitacao_fk, pontos) VALUES (?, ?)";
         
         PreparedStatement ps = conn.prepareStatement(sql);

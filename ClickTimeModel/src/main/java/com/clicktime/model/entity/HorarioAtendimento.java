@@ -1,6 +1,7 @@
 package com.clicktime.model.entity;
 
 import com.clicktime.model.base.BaseEntity;
+import com.clicktime.model.util.StringUtils;
 import java.util.Objects;
 import org.joda.time.DateTime;
 
@@ -47,6 +48,9 @@ public class HorarioAtendimento extends BaseEntity implements Comparable<Horario
     }
 
     public void setStatus(String status) {
+        if(StringUtils.isBlank(status)){
+            status = "B";
+        }
         this.status = status;
     }
 

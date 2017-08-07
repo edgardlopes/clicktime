@@ -43,7 +43,7 @@
                             <div class="panel-body">
                                 <p><strong>Descrição: </strong>${execucao.descricao}</p>
 
-                                <p><strong>Duração: </strong><joda:format value="${execucao.duracao}" pattern="HH:mm"/></p>
+                                <p><strong>Duração: </strong><t:time time="${execucao.duracao}"/></p>
                                 <p><strong>Valor: </strong>${execucao.valor}</p>
                                 <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modalExcluir" data-whatever="<c:url value="/servico/${execucao.id}/excluir" />">Excluir</button>                                        
                                 <!--<a href="<c:url value="/servico/${execucao.id}/excluir" />" class="btn btn-default" > Excluir</a>-->

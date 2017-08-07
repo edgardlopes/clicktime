@@ -164,19 +164,15 @@ public class CalendarioService {
 
     public static DateTime parseStringToDateTime(String dateTimeStr, String pattern) throws Exception {
         DateTimeFormatter formatter = DateTimeFormat.forPattern(pattern);
-        DateTime dt = formatter.parseDateTime(dateTimeStr);
+        return formatter.parseDateTime(dateTimeStr);
 
-        return dt;
     }
 
     public static DateTime getFirstDayOfWeek(DateTime day) {
-        DateTime first = null;
-
         if (day.getDayOfWeek() == 7) {
             return day;
         } else {
-            first = day.withDayOfWeek(1).minusDays(1);
-            return first;
+            return day.withDayOfWeek(1).minusDays(1);
         }
     }
 

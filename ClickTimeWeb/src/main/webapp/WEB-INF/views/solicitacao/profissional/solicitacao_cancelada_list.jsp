@@ -40,7 +40,7 @@
                             <joda:format pattern="HH:mm" value="${solicitacao.horarioAtendimentoList[0].horaInicio}" var="horaInicio"/>
                             <joda:format pattern="HH:mm" value="${solicitacao.horarioAtendimentoList[0].horaFim}" var="horaFim"/>
                             <input type="hidden" id="solicitacaoHorario" value="${horaInicio} - ${horaFim}">
-
+                            <t:time time="" var="a"/>
                             <h3 class="panel-title text-center capitalize">${horaInicio} - ${horaFim} ${solicitacao.execucao.servico.nome}</h3>
                         </div>
                         <div class="panel-body">    

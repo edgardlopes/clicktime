@@ -1,6 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags/"%>
-<%@taglib prefix="joda" uri="http://www.joda.org/joda/time/tags" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <t:wrapper>
 
@@ -33,10 +32,7 @@
                                     <c:if test="${solicitacao.status != '1'}">
                                         <p class="text-center">
                                             <strong>Horário:</strong>
-                                            <%--<joda:format pattern="dd/MM/yyyy" value="${solicitacao.horarioAtendimentoList[0].diaAtendimento.data}"/>--%>
-                                            <joda:format pattern="HH:mm" value="${solicitacao.horarioAtendimentoList[0].horaInicio}"/>
-
-                                            <%--<joda:format pattern="HH:mm" value="${solicitacao.horarioAtendimentoList[0].horaFim}"/>--%>
+                                            <t:time time="${solicitacao.horarioAtendimentoList[0].horaInicio}"/>
                                         </p>
                                     </c:if>
                                     <p class="text-center"><strong>Profissional:</strong> ${solicitacao.execucao.profissional.nome}</p>
@@ -57,7 +53,7 @@
                                         <c:if test="${solicitacao.status == '1'}">
                                             <p class="text-center"><strong>Status:</strong>  Remarcado para dia
                                                 <joda:format pattern="dd/MM/yyyy" value="${solicitacao.horarioAtendimentoList[0].diaAtendimento.data}"/> as 
-                                                <joda:format pattern="HH:mm" value="${solicitacao.horarioAtendimentoList[0].horaInicio}"/>
+                                                <t:time time="${solicitacao.horarioAtendimentoList[0].horaInicio}"/>
                                             </p>
                                             <p class="text-center"><strong>Resposta do profissional:</strong> <em>"${solicitacao.descricao}"</em></p>
                                         </c:if>

@@ -199,12 +199,12 @@
                                     <label id="${horario.id}" class="horario btn <c:if test="${horario.status == 'L'}">btn-success</c:if> <c:if test="${horario.status == 'B'}">btn-danger</c:if> <c:if test="${horario.status == 'R'}">btn-info</c:if> <c:if test="${horario.status == '1'}">btn-warning</c:if> center-block">
                                         <c:if test="${horario.status != 'R' && horario.status != '1'}">
                                             <input type="checkbox" class="checkbox-horario case" name="horario" id="horario${horario.id}" value="${horario.id}"/>
-                                            <joda:format value="${horario.horaInicio}" pattern="HH:mm"/> - <joda:format value="${horario.horaFim}" pattern="HH:mm"/>
+                                            <t:time time="${horario.horaInicio}"/> - <t:time time="${horario.horaFim}"/>
                                         </c:if>
 
                                         <c:if test="${horario.status == 'R'}">
                                             <p>
-                                                <joda:format value="${horario.horaInicio}" pattern="HH:mm"/> - <joda:format value="${horario.horaFim}" pattern="HH:mm"/>
+                                                <t:time time="${horario.horaInicio}"/> - <t:time time="${horario.horaFim}"/>
                                             </p>
                                             <!--<p>Horario reservado!</p>-->
                                             <div class="info-horario">
@@ -222,7 +222,7 @@
 
                                         <c:if test="${horario.status == '1'}">
                                             <p>
-                                                <joda:format value="${horario.horaInicio}" pattern="HH:mm"/> - <joda:format value="${horario.horaFim}" pattern="HH:mm"/>
+                                                <t:time time="${horario.horaInicio}"/> - <t:time time="${horario.horaFim}"/>
                                             </p>
                                             <!--<p>Aguardando resposta!</p>-->
                                             <div class="info-horario-ar">

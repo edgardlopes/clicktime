@@ -6,6 +6,7 @@ import com.clicktime.model.entity.CategoriaServico;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +14,7 @@ import java.util.Map;
 public class CategoriaServicoDAO implements BaseDAO<CategoriaServico> {
 
     @Override
-    public void create(Connection conn, CategoriaServico e) throws Exception {
+    public void create(Connection conn, CategoriaServico e) throws SQLException {
         String sql  = "INSERT INTO categoria_servico(nome) VALUES (?) returning id";
         PreparedStatement ps = conn.prepareStatement(sql);
         ps.setString(1, e.getNome());
@@ -27,12 +28,12 @@ public class CategoriaServicoDAO implements BaseDAO<CategoriaServico> {
     }
 
     @Override
-    public CategoriaServico readById(Connection conn, Long id) throws Exception {
+    public CategoriaServico readById(Connection conn, Long id) throws SQLException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public List<CategoriaServico> readByCriteria(Connection conn, Map<String, Object> criteria, Integer offset) throws Exception {
+    public List<CategoriaServico> readByCriteria(Connection conn, Map<String, Object> criteria, Integer offset) throws SQLException {
         List<CategoriaServico> categorias = new ArrayList<>();
         String sql = "SELECT * from categoria_servico WHERE 1=1";
 
@@ -59,12 +60,12 @@ public class CategoriaServicoDAO implements BaseDAO<CategoriaServico> {
     }
 
     @Override
-    public void update(Connection conn, CategoriaServico e) throws Exception {
+    public void update(Connection conn, CategoriaServico e) throws SQLException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void delete(Connection conn, Long id) throws Exception {
+    public void delete(Connection conn, Long id) throws SQLException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
