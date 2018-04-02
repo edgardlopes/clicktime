@@ -2,27 +2,28 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
 <%@ taglib tagdir="/WEB-INF/tags/" prefix="t" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<t:wrapper>
+<t:parent>
 
-    <form method="POST" id="form-usuario" class="col-lg-12  " enctype="multipart/form-data">
+    <form method="POST" id="form-usuario " enctype="multipart/form-data">
         <input type="hidden" name="id" value="${usuario.id}">
-        <div class="panel panel-primary">
-            <div class="panel-heading">
-                <h3 class="panel-title"><c:if test="${isUpdate != true}">Cadastro de Usuario</c:if><c:if test="${isUpdate == true}">Minha conta</c:if></h3>
+        <div class="box box-primary">
+            <div class="box-header">
+                <h3 class="box-title"><c:if test="${isUpdate != true}">Cadastro de Usuario</c:if><c:if test="${isUpdate == true}">Minha conta</c:if></h3>
                 </div>
-                <div class="panel-body">
-                    <div class="form-group col-lg-6">
-                        <label for="nome" class="control-label">Nome <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="nome" name="nome" value="${usuario.nome}" placeholder="Nome">
-                    <c:if test="${errors.nome != null}"><p class="text-danger">${errors.nome}</p></c:if>
-                    </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="form-group col-lg-6">
+                            <label for="nome" class="control-label">Nome <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="nome" name="nome" value="${usuario.nome}" placeholder="Nome">
+                        <c:if test="${errors.nome != null}"><p class="text-danger">${errors.nome}</p></c:if>
+                        </div>
 
-                    <div class="form-group col-lg-6">
-                        <label for="sobrenome" class="control-label">Sobrenome <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="sobrenome" name="sobrenome" value="${usuario.sobrenome}" placeholder="Nome">
-                    <c:if test="${errors.sobrenome != null}"><p class="text-danger">${errors.sobrenome}</p></c:if>                       
+                        <div class="form-group col-lg-6">
+                            <label for="sobrenome" class="control-label">Sobrenome <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="sobrenome" name="sobrenome" value="${usuario.sobrenome}" placeholder="Nome">
+                        <c:if test="${errors.sobrenome != null}"><p class="text-danger">${errors.sobrenome}</p></c:if>                       
+                        </div>
                     </div>
-
                     <div class="form-group">
                         <label for="nome-usuario" class="control-label">Nome de Usuário <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="nome-usuario" name="nomeUsuario" value="${usuario.nomeUsuario}" placeholder="Nome">
@@ -58,15 +59,16 @@
 
 
                 <c:if test="${isUpdate != true}">
-                    <a href="<c:url value="/index.jsp"/>" class="btn btn-danger">Desistir</a>
+                    <div class="btn-group pull-right">
+                        <a href="<c:url value="/index.jsp"/>" class="btn btn-danger">Desistir</a>
 
-                    <button type="submit" class="btn btn-success">Concluir</button>
-
+                        <button type="submit" class="btn btn-success">Concluir</button>
+                    </div>
                 </c:if>
                 <c:if test="${isUpdate == true}">
-                    <button type="submit" class="btn btn-primary">Salvar alterações</button>
+                    <button type="submit" class="btn btn-primary pull-right">Salvar alterações</button>
                 </c:if>
             </div>
         </div>
     </form>
-</t:wrapper>
+</t:parent>

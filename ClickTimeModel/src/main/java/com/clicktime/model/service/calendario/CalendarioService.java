@@ -6,11 +6,11 @@ import com.clicktime.model.entity.DiaAtendimentoResumo;
 import com.clicktime.model.entity.Profissional;
 import com.google.gson.Gson;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -24,22 +24,9 @@ public class CalendarioService {
     public static final String MONTH_AS_STRING = "monthAsString";
     public static final String DAYS_OF_MONTH = "weekList";
 
-    private int year;
-    private int month;
-    private Profissional profissional;
-    private List<DiaAtendimentoResumo> resumoList;
-    private boolean isProfissional;
+    private List<DiaAtendimentoResumo> resumoList = new ArrayList<>();
 
-    private Map<String, Object> informationsOfMonth;
-
-    public CalendarioService(int year, int month, Profissional profissional, boolean isProfissional) {
-        this.year = year;
-        this.month = month;
-        this.profissional = profissional;
-        this.isProfissional = isProfissional;
-    }
-
-    public Map<String, Object> getInformations() {
+    public Map<String, Object> getInformations(int year, int month, Profissional profissional, boolean isProfissional) {
         DateTime dt = new DateTime(year, month, 1, 0, 0);
         DateTime aux = new DateTime(dt.getYear(), dt.getMonthOfYear(), dt.getDayOfMonth(), 0, 0);
 
@@ -50,7 +37,7 @@ public class CalendarioService {
         if (isProfissional) {
             readReportFromMonth(da);
         }
-        informationsOfMonth = new HashMap<>();
+        Map<String, Object> informationsOfMonth = new HashMap<>();
         informationsOfMonth.put(MONTH_AS_STRING, dt.monthOfYear().getAsText());
 
         List<List> weekList = new ArrayList<>();
@@ -123,43 +110,33 @@ public class CalendarioService {
     }
 
     public List<DiaAtendimentoResumo> readReportFromMonth(DiaAtendimento da) {
-        resumoList = new ArrayList<DiaAtendimentoResumo>();
         try {
-            resumoList = ServiceLocator.getDiaAtendimentoResumoService().reportFromMonth(da);
+            return ServiceLocator.getDiaAtendimentoResumoService().reportFromMonth(da);
         } catch (Exception ex) {
-            Logger.getLogger(CalendarioService.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException(ex);
         }
-
-        return resumoList;
     }
 
     public DiaAtendimentoResumo containsDay(DateTime dt) {
-
-        if (resumoList != null) {
-            for (DiaAtendimentoResumo d : resumoList) {
-                if (d.getDiaAtendimento().getData().getDayOfMonth() == dt.getDayOfMonth()) {
-                    return d;
-                }
-            }
-        }
-        return null;
+        return resumoList.stream().filter(resumo -> resumo.getDiaAtendimento().getData().getDayOfMonth() == dt.getDayOfMonth())
+                .findAny().orElse(null);
     }
 
     public Map<String, String> parseJsonToFeriadoMap(String jsonFeriados) {
-        List<Map> feriados = new ArrayList<Map>();
 
-        Map<String, String> feriadoMap = new HashMap<String, String>();
-        if (!jsonFeriados.equals("-1")) {
-            Gson g = new Gson();
-            Class c = new HashMap<String, String>().getClass();
-            Map<String, List> map = (Map<String, List>) g.fromJson(jsonFeriados, c);
-            feriados = map.get("holidays");
-            for (Map feriado : feriados) {
-                feriadoMap.put((String) feriado.get("date"), (String) feriado.get("name"));
-            }
+        if (jsonFeriados.equals("-1")) {
+            return Collections.emptyMap();
+
         }
 
-        return feriadoMap;
+        Gson g = new Gson();
+        Class c = new HashMap<>().getClass();
+        Map<String, List> map = (Map<String, List>) g.fromJson(jsonFeriados, c);
+
+        List<Map> feriados = map.get("holidays");
+
+        return feriados.stream().collect(Collectors.toMap(f -> (String) f.get("date"), f -> (String) f.get("name")));
+
     }
 
     public static DateTime parseStringToDateTime(String dateTimeStr, String pattern) throws Exception {
@@ -170,22 +147,17 @@ public class CalendarioService {
     }
 
     public static DateTime getFirstDayOfWeek(DateTime day) {
-        DateTime first = null;
-
         if (day.getDayOfWeek() == 7) {
             return day;
-        } else {
-            first = day.withDayOfWeek(1).minusDays(1);
-            return first;
         }
+        return day.withDayOfWeek(1).minusDays(1);
     }
 
     public static DateTime getLastDayOfWeek(DateTime day) {
         if (day.getDayOfWeek() == 7) {
             return day.plusDays(1).withDayOfWeek(6);
-        } else {
-            return day.withDayOfWeek(6);
         }
+        return day.withDayOfWeek(6);
     }
 
 }

@@ -14,79 +14,74 @@
         overflow: auto;
     }
 </style>
-<t:wrapper>
+<t:parent>
 
-    <div class="panel panel-info">
-        <div class="panel-heading">
-            <h3 class="panel-title text-center">Minhas solicitações</h3>
+    <div class="box box-primary">
+        <div class="box-header">
+            <h3 class="box-title">Minhas solicitações</h3>
         </div>
-        <div class="panel-body">
+        <div class="box-body">
             <c:if test="${not empty solicitacaoList }">
                 <jsp:include page="../filtro.jsp" />
 
-                <c:forEach var="solicitacao" items="${solicitacaoList}">
+                <table class="table table-striped">
+                    <tr>
+                        <th>Data</th>
+                        <th>Serviço</th>
+                        <th>Cliente</th>
+                        <th>Horario</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                    <c:forEach var="solicitacao" items="${solicitacaoList}">
+                        <tr class="solicitacao">
+                            <!--tinha que melhorar esse hidden-->
+                            <td class="hidden">
+                                <input type="hidden" id="solicitacaoID" value="${solicitacao.id}">
+                                <input type="hidden" id="clienteNome" value="${solicitacao.usuario.nome}">
+                                <input type="hidden" id="servicoNome" value="${solicitacao.execucao.servico.nome}">
+                                <input type="hidden" id="servicoID" value="${solicitacao.execucao.id}">
+                                <joda:format pattern="dd/MM/yyyy" value="${solicitacao.horarioAtendimentoList[0].diaAtendimento.data}" var="solicitacaoDia"/>
+                                <input type="hidden" id="solicitacaoDia" value="${solicitacaoDia}">
+                                <joda:format pattern="HH:mm" value="${solicitacao.horarioAtendimentoList[0].horaInicio}" var="horaInicio"/>
+                                <joda:format pattern="HH:mm" value="${solicitacao.horarioAtendimentoList[0].horaFim}" var="horaFim"/>
+                                <input type="hidden" id="solicitacaoHorario" value="${horaInicio} - ${horaFim}">
+                            </td>
 
-                    <div class="solicitacao panel panel-primary">
-                        <div class="panel-heading">
-                            <input type="hidden" id="solicitacaoID" value="${solicitacao.id}">
-                            <input type="hidden" id="clienteNome" value="${solicitacao.usuario.nome}">
-                            <input type="hidden" id="servicoNome" value="${solicitacao.execucao.servico.nome}">
-                            <input type="hidden" id="servicoID" value="${solicitacao.execucao.id}">
-                            <joda:format pattern="dd/MM/yyyy" value="${solicitacao.horarioAtendimentoList[0].diaAtendimento.data}" var="solicitacaoDia"/>
-                            <input type="hidden" id="solicitacaoDia" value="${solicitacaoDia}">
-                            <joda:format pattern="HH:mm" value="${solicitacao.horarioAtendimentoList[0].horaInicio}" var="horaInicio"/>
-                            <joda:format pattern="HH:mm" value="${solicitacao.horarioAtendimentoList[0].horaFim}" var="horaFim"/>
-                            <input type="hidden" id="solicitacaoHorario" value="${horaInicio} - ${horaFim}">
-
-                            <h3 class="panel-title text-center"><joda:format pattern="dd/MM/yyyy" value="${solicitacao.horarioAtendimentoList[0].diaAtendimento.data}"/> ${solicitacao.execucao.servico.nome}</h3>
-                        </div>
-
-                        <div class="panel-body">
-                            <div class="<c:if test="${solicitacao.status != 'A'}">col-lg-12</c:if><c:if test="${solicitacao.status == 'A'}">col-lg-6</c:if>">
-                                <p><strong>Cliente:</strong> ${solicitacao.usuario.nome}</p>
-                                <p><strong>Horário:</strong>
-                                    <joda:format pattern="HH:mm" value="${solicitacao.horarioAtendimentoList[0].horaInicio}"/>
-                                </p>
-
+                            <td><joda:format pattern="dd/MM/yyyy" value="${solicitacao.horarioAtendimentoList[0].diaAtendimento.data}"/></td>
+                            <td>${solicitacao.execucao.servico.nome}</td>
+                            <td>${solicitacao.usuario.nome}</td>
+                            <td><joda:format pattern="HH:mm" value="${solicitacao.horarioAtendimentoList[0].horaInicio}"/></td>
+                            <td>
                                 <c:if test="${solicitacao.status == 'A'}">
-                                    <p><strong>Status:</strong> Aguardando resposta</p>
-
+                                    Aguardando resposta
                                 </c:if>
 
                                 <c:if test="${solicitacao.status == 'S'}">
-                                    <p><strong>Status:</strong> Reservado!</p>
+                                    Reservado!
                                 </c:if>
                                 <c:if test="${solicitacao.status == 'R'}">
-                                    <p><strong>Status:</strong> Recusado! :/</p>
+                                    Recusado! :/
                                 </c:if>
-
                                 <c:if test="${solicitacao.status == '1'}">
-                                    <p class="text-center"><strong>Status: </strong> Remarcado para dia
-                                        <joda:format pattern="dd/MM/yyyy" value="${solicitacao.horarioAtendimentoList[0].diaAtendimento.data}"/> as 
-                                        <joda:format pattern="HH:mm" value="${solicitacao.horarioAtendimentoList[0].horaInicio}"/>
-                                    </p>
-                                    <p class="text-center"><strong>Mensagem: </strong><em>"${solicitacao.descricao}"</em></p>
+                                    Remarcado para dia
+                                    <joda:format pattern="dd/MM/yyyy" value="${solicitacao.horarioAtendimentoList[0].diaAtendimento.data}"/> as 
+                                    <joda:format pattern="HH:mm" value="${solicitacao.horarioAtendimentoList[0].horaInicio}"/>
+                                    (<em>"${solicitacao.descricao}"</em>)
                                 </c:if>
-                            </div>
-                            <c:if test="${solicitacao.status == 'A'}">
-                                <div class="col-lg-6 col-xs-12 pull-right">
-                                    <div class="centered">    
-                                        <a href="<c:url value="/solicitacao/${solicitacao.id}/aceitar"/>" class="btn btn-success btn-block">Aceitar</a>
-                                        <div class="btn-group btn-group-justified" role="group" style="margin-top: 5px;" aria-label="...">
-                                            <div class="btn-group" role="group">
-                                                <button type="button" class="btn btn-default" data-whatever="${solicitacao.id}" data-toggle="modal" data-target="#modalRecusar">Recusar</button>
-                                            </div>
-                                            <div class="btn-group" role="group">
-                                                <button  type="button" class="btn btn-primary btn-rejeitar" data-toggle="modal" data-target="#modalRejeitar">Adiar</button>
-                                            </div>
-                                        </div>
+                            </td>
+                            <td>
+                                <c:if test="${solicitacao.status == 'A'}">
+                                    <div class="btn-group btn-group-xs" role="group" style="margin-top: 5px;" aria-label="...">
+                                        <a href="<c:url value="/solicitacao/${solicitacao.id}/aceitar"/>" class="btn btn-success">Aceitar</a>
+                                        <button type="button" class="btn btn-default" data-whatever="${solicitacao.id}" data-toggle="modal" data-target="#modalRecusar">Recusar</button>
+                                        <button  type="button" class="btn btn-primary btn-rejeitar" data-toggle="modal" data-target="#modalRejeitar">Adiar</button>
                                     </div>
-                                </div>
-                            </c:if>
-                        </div>                   
-                    </div>
-                </c:forEach>
-                <%@include file="../controle_paginacao.jsp" %>
+                                </c:if>
+                            </td>
+                        </tr>
+                    </c:forEach>
+                </table>
             </c:if>
 
             <c:if test="${empty solicitacaoList }">
@@ -94,7 +89,7 @@
             </c:if>
         </div>
     </div>
-</t:wrapper>
+</t:parent>
 
 <!--Modal sugestao-->
 <div class="modal fade" id="modalRejeitar" tabindex="-1" role="dialog" aria-labelledby="modalSugestaoLabel">

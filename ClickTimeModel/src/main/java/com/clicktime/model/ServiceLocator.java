@@ -57,7 +57,7 @@ public class ServiceLocator {
         return new DiaAtendimentoResumoService();
     }
     
-    public static CalendarioService getCalendarioService(int year, int month, Profissional profissional, boolean isProfissional){
-        return new CalendarioService(year, month, profissional, isProfissional);
+    public static CalendarioService getCalendarioService(){
+        return new CalendarioService();
     }
 }

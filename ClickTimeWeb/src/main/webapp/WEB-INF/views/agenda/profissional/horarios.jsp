@@ -3,36 +3,9 @@
 <%@taglib prefix="t" tagdir="/WEB-INF/tags/" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 
-<t:wrapper>
+<t:parent>
 
 <style>
-    .panel-title .btn{
-        position: absolute;
-        top: 8px;
-    }
-
-    .btn-prev-day{
-        left: 15px;
-    }
-
-    .btn-next-day{
-        right: 15px;
-    }
-
-
-    .horarios-wrapper{
-        height: 500px;
-        overflow: auto;
-    }
-
-    .horario-info{
-        display: inline-block;
-    }
-
-    .horario{
-        height: 40px;
-    }
-
     .aguardando-resposta{
         background: #E87E04;
     }
@@ -130,46 +103,12 @@
         }
     }
 
-    /*@media(max-width: 640px) and (min-width: 601px){*/
-    @media (min-width: 601px){
-        .horarios-wrapper{
-            width: 47%;
-        }
-
-        .horario-controle-content
-        {
-            position: relative;
-        }
-
-        .controles-wrapper{
-            position: absolute; 
-            width: 47%;
-            right: 15px;
-            top: 15px;
-        }
-    }
-
-    .btn-block+.btn-block{
-        margin-top: 0px;
-    }
-
-    .controles-wrapper .btn-block{
-        margin-top: 2px;
-    }
-
-    .info-horario .panel-body p{
-        color: #000;
-    }
-    .info-horario-ar .panel-body p{
-        color: #000;
-    }
-    
 </style>
 
     <div class="centered">
-        <div class="panel panel-info">
-            <div class="panel-heading">
-                <h3 class="panel-title text-center">
+        <div class="box box-info">
+            <div class="box-header">
+                <h3 class="box-title">
                     <c:set var="dataParam" value="${dia.data}"/>
                     <joda:format pattern="yyyy/MM/dd" value="${dataParam.minusDays(1)}" var="prevDay"/>
                     <a href="<c:url value="/agenda/${prevDay}"/>" class="btn btn-xs btn-link btn-prev-day"><span class="glyphicon glyphicon-chevron-left"></span></a>
@@ -181,7 +120,6 @@
 
             <div class="panel-body horario-controle-content">
                 <c:if test="${empty horarioList}">
-                    <img src="<c:url value="/img/icons/generate_horario.png"/>" class="img-circle img-responsive centered"/>
                     <p>Você nao tem nenhum horario cadastrado para este dia. Cadastre os horarios agora mesmo e comece a receber solicitacoes</p>
                     <joda:format value="${dia.data}" pattern="yyyy/MM/dd" var="diaStr"/>
                     <a href="<c:url value="/agenda/${diaStr}/cadastrarHorarios" />" class="btn btn-primary center-block">Cadastrar horários</a>
@@ -194,9 +132,10 @@
                             <input type="hidden" value="<joda:format value="${dia.data}" pattern="yyyy"/>" name="diaAtendimento" id="ano"/>
                             <input type="hidden" value="<joda:format value="${dia.data}" pattern="MM"/>" name="diaAtendimento" id="mes"/>
 
-                            <div class="horarios-wrapper">
+                            <div class="horarios-wrapper col-lg-6">
                                 <c:forEach var="horario" items="${horarioList}">
                                     <label id="${horario.id}" class="horario btn <c:if test="${horario.status == 'L'}">btn-success</c:if> <c:if test="${horario.status == 'B'}">btn-danger</c:if> <c:if test="${horario.status == 'R'}">btn-info</c:if> <c:if test="${horario.status == '1'}">btn-warning</c:if> center-block">
+                                        ${horario.status}
                                         <c:if test="${horario.status != 'R' && horario.status != '1'}">
                                             <input type="checkbox" class="checkbox-horario case" name="horario" id="horario${horario.id}" value="${horario.id}"/>
                                             <joda:format value="${horario.horaInicio}" pattern="HH:mm"/> - <joda:format value="${horario.horaFim}" pattern="HH:mm"/>
@@ -247,8 +186,8 @@
                             <!--Botao para controlar menu-->
                             <button type="button" class="btn btn-warning toggle-controles"><span class="glyphicon glyphicon-option-vertical"></span></button>
                             <!--Aplicar a mais de um dia--> 
-                            <div class="controles-wrapper">
-                                <div class="alert panel panel-primary">
+                            <div class="controles-wrapper col-lg-6">
+                                <div class="panel panel-primary">
                                     <div class="panel-heading">
                                         <h4 class="panel-title text-center">Controles</h4>
                                         <button type="button" data-dismis="alert" class="btn btn-link myClose close">x</button>
@@ -292,7 +231,7 @@
             </div>
         </div>
     </div>
-</t:wrapper>
+</t:parent>
 
 
 <!-- Modal -->

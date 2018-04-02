@@ -2,64 +2,46 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@taglib prefix="joda" uri="http://www.joda.org/joda/time/tags"%>
 <%@taglib prefix="t" tagdir="/WEB-INF/tags/"%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<style>
-    .panel p{
-        text-align: left;
-    }
+<t:parent>
+    <div class="box box-info">
+        <div class="box-header">
+            <h3 class="box-title">Meus Serviços</h3>
+            <div class="box-tools">
+                <a href="<c:url value="/servico/novo"/>" class="pull-right btn btn-primary btn-sm no-margin ">Cadastrar novo servico</a>
+            </div>
 
-    .btn-novo{
-        margin: 5px 0;
-    }
-
-    .menu-invisible{
-        display: none;
-    }
-
-    .servico{
-        padding: 5px;
-    }
-</style>
-
-<t:wrapper>
-
-
-    <div class="panel panel-info">
-        <div class="panel-heading">
-            <h3 class="panel-title text-center">Meus servicos</h3>
         </div>
-        <div class="panel-body">
-            <a href="<c:url value="/servico/novo"/>" class="btn btn-primary btn-novo">Cadastrar novo servico</a>
-            <br>
-
-            <c:if test="${not empty execucaoList}">
+        <!-- /.box-header -->
+        <div class="box-body no-padding">
+            <table class="table table-striped">
+                <tr>
+                    <th>Nome</th>
+                    <th>Descrição</th>
+                    <th>Duração</th>
+                    <th>Valor</th>
+                    <th></th>
+                </tr>
                 <c:forEach var="execucao" items="${execucaoList}">
-                    <div class="col-lg-4 servico">                            
-                        <div class="panel panel-primary">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">${execucao.servico.nome}</h3>
-                            </div>
-                            <div class="panel-body">
-                                <p><strong>Descrição: </strong>${execucao.descricao}</p>
-
-                                <p><strong>Duração: </strong><joda:format value="${execucao.duracao}" pattern="HH:mm"/></p>
-                                <p><strong>Valor: </strong>${execucao.valor}</p>
-                                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modalExcluir" data-whatever="<c:url value="/servico/${execucao.id}/excluir" />">Excluir</button>                                        
+                    <tr>
+                        <td>${execucao.servico.nome}</td>
+                        <td>${execucao.descricao}</td>
+                        <td><joda:format value="${execucao.duracao}" pattern="HH:mm"/></td>
+                        <td>${execucao.valor}</td>
+                        <td>
+                            <div class="btn-group btn-group-xs">
+                                <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#modalExcluir" data-whatever="<c:url value="/servico/${execucao.id}/excluir" />">Excluir</button>                                        
                                 <!--<a href="<c:url value="/servico/${execucao.id}/excluir" />" class="btn btn-default" > Excluir</a>-->
-                                <a href="<c:url value="/servico/${execucao.id}/editar"/>" class="btn btn-primary">Editar</a>
+                                <a href="<c:url value="/servico/${execucao.id}/editar"/>" class="btn btn-primary btn-xs">Editar</a>
                             </div>
-                        </div>
-                    </div>
+                        </td>
+                    </tr>
                 </c:forEach>
-            </c:if>
-            <c:if test="${empty execucaoList}">
-                <h1>Nenhum servico cadastrado!</h1>
-            </c:if>
+            </table>
         </div>
+        <!-- /.box-body -->
     </div>
-</t:wrapper>
-
+</t:parent>
 
 <div class="modal fade" id="modalExcluir" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
     <div class="modal-dialog" role="document">

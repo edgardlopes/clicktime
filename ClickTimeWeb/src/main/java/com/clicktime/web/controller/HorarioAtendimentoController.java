@@ -1,6 +1,7 @@
 package com.clicktime.web.controller;
 
-import com.clicktime.model.ServiceLocator;
+import com.clicktime.model.base.service.BaseDiaAtendimentoService;
+import com.clicktime.model.base.service.BaseHorarioAtendimentoService;
 import com.clicktime.model.criteria.HorarioAtendimentoCriteria;
 import com.clicktime.model.entity.DiaAtendimento;
 import com.clicktime.model.entity.HorarioAtendimento;
@@ -13,34 +14,44 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpSession;
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 public class HorarioAtendimentoController {
+    
+    @Autowired
+    private BaseDiaAtendimentoService diaAtendimentoService;
 
-    @RequestMapping(value = "/agenda/{year}/{month}/{day}/bloquearHorarios", method = RequestMethod.POST)
+    @Autowired
+    private BaseHorarioAtendimentoService horarioAtendimentoService;
+
+    @Autowired
+    private CalendarioService calendarioService;
+
+    @PostMapping( "/agenda/{year}/{month}/{day}/bloquearHorarios")
     public String block(HttpSession session, @PathVariable Integer year, @PathVariable Integer month, @PathVariable Integer day, Long[] horario,
             String aplicar, Boolean aplicarSabado, Boolean aplicarDomingo, Boolean aplicarFeriados, String jsonFeriados) throws Exception {
         DateTime dt = new DateTime(year, month, day, 0, 0);
         if (horario != null) {
-            ServiceLocator.getHorarioAtendimentoService().updateList(horario, HorarioAtendimentoService.BLOCK_HORARIO_ATENDIMENTO);
+            horarioAtendimentoService.updateList(horario, HorarioAtendimentoService.BLOCK_HORARIO_ATENDIMENTO);
         }
         //replicarHorarios(dt, session, aplicar, aplicarDomingo, aplicarSabado, aplicarFeriados, jsonFeriados);
 
         return "redirect:/agenda/" + dt.toString("yyyy/MM/dd/");
     }
 
-    @RequestMapping(value = "/agenda/{year}/{month}/{day}/liberarHorarios", method = RequestMethod.POST)
+    @PostMapping( "/agenda/{year}/{month}/{day}/liberarHorarios")
     public String release(HttpSession session, @PathVariable Integer year, @PathVariable Integer month,
             @PathVariable Integer day, Long[] horario, String aplicar,
             Boolean aplicarSabado, Boolean aplicarDomingo, Boolean aplicarFeriados, String jsonFeriados) throws Exception {
 
         DateTime dt = new DateTime(year, month, day, 0, 0);
         if (horario != null) {
-            ServiceLocator.getHorarioAtendimentoService().updateList(horario, HorarioAtendimentoService.RELEASE_HORARIO_ATENDIMENTO);
+            horarioAtendimentoService.updateList(horario, HorarioAtendimentoService.RELEASE_HORARIO_ATENDIMENTO);
         }
         //verificar..
         //replicarHorarios(dt, session, aplicar, aplicarDomingo, aplicarSabado, aplicarFeriados, jsonFeriados);
@@ -48,7 +59,7 @@ public class HorarioAtendimentoController {
         return "redirect:/agenda/" + dt.toString("yyyy/MM/dd/");
     }
 
-    @RequestMapping(value = "/agenda/{year}/{month}/{day}/cadastrarHorarios")
+    @GetMapping("/agenda/{year}/{month}/{day}/cadastrarHorarios")
     public String create(@PathVariable Integer year, @PathVariable Integer month, @PathVariable Integer day, HttpSession session) throws Exception {
         Profissional p = (Profissional) getLoggedUser(session);
         DiaAtendimento da = new DiaAtendimento();
@@ -57,18 +68,18 @@ public class HorarioAtendimentoController {
 
         da.setProfissional(p);
         da.setData(dt);
-        ServiceLocator.getDiaAtendimentoService().readOrCreate(da);
-        ServiceLocator.getHorarioAtendimentoService().generateHorarioAtendimentoList(da);
+        diaAtendimentoService.readOrCreate(da);
+        horarioAtendimentoService.generateHorarioAtendimentoList(da);
 
         return "redirect:/agenda/" + dt.toString("yyyy/MM/dd/");
     }
 
-    @RequestMapping(value = "/agenda/{year}/{month}/{day}/replicarHorarios", method = RequestMethod.POST)
+    @PostMapping( "/agenda/{year}/{month}/{day}/replicarHorarios")
     public String replicar(HttpSession session, @PathVariable Integer year, @PathVariable Integer month,
             @PathVariable Integer day, Long diaAtendimentoID, String aplicar,
             Boolean aplicarSabado, Boolean aplicarDomingo, Boolean aplicarFeriados, String jsonFeriados, Boolean bloquearReservados) throws Exception {
         DateTime dt = new DateTime(year, month, day, 1, 1);
-        DiaAtendimento diaAtendimento = ServiceLocator.getDiaAtendimentoService().readById(diaAtendimentoID);
+        DiaAtendimento diaAtendimento = diaAtendimentoService.readById(diaAtendimentoID);
         replicarHorarios(diaAtendimento, session, aplicar, aplicarDomingo, aplicarSabado, aplicarFeriados, jsonFeriados, bloquearReservados);
         return "redirect:/agenda/" + dt.toString("yyyy/MM/dd/");
     }
@@ -77,7 +88,7 @@ public class HorarioAtendimentoController {
             String aplicar, Boolean aplicarDomingo, Boolean aplicarSabado, Boolean aplicarFeriados,
             String jsonFeriados, HttpSession session, List<HorarioAtendimento> horarioList, Boolean bloquarReservados) {
 
-        Map<String, String> feriadoMap = ServiceLocator.getCalendarioService(dia.getData().getYear(), dia.getData().getMonthOfYear(), null, false).parseJsonToFeriadoMap(jsonFeriados);
+        Map<String, String> feriadoMap = calendarioService.parseJsonToFeriadoMap(jsonFeriados);
 
         if (aplicarDomingo == null) {
             aplicarDomingo = false;
@@ -106,11 +117,11 @@ public class HorarioAtendimentoController {
                 diaAtendimento.setData(comeco);
                 diaAtendimento.setProfissional((Profissional) getLoggedUser(session));
                 try {
-                    ServiceLocator.getDiaAtendimentoService().readOrCreate(diaAtendimento);
+                    diaAtendimentoService.readOrCreate(diaAtendimento);
                     if (!diaAtendimento.getId().equals(dia.getId())) {
                         Map<String, Object> criteria = new HashMap<>();
                         criteria.put(HorarioAtendimentoCriteria.DIA_ATENDIMENTO_FK_EQ, diaAtendimento.getId());
-                        List<HorarioAtendimento> listaAux = ServiceLocator.getHorarioAtendimentoService().readByCriteriaCliente(criteria, null);
+                        List<HorarioAtendimento> listaAux = horarioAtendimentoService.readByCriteriaCliente(criteria, null);
                         if (listaAux.size() == 0) {
                             for (HorarioAtendimento horario : horarioList) {
                                 horario.setDiaAtendimento(diaAtendimento);
@@ -125,7 +136,7 @@ public class HorarioAtendimentoController {
                                     horario.setStatus(HorarioAtendimento.HORARIO_LIVRE);
                                 }
                             }
-                            ServiceLocator.getHorarioAtendimentoService().createHorarioAtendimentoList(horarioList);
+                            horarioAtendimentoService.createHorarioAtendimentoList(horarioList);
                         } else {
                             for (int i = 0; i < listaAux.size(); i++) {
                                 if (horarioList.get(i).getStatus().equals(HorarioAtendimento.HORARIO_RESERVADO)) {
@@ -147,7 +158,7 @@ public class HorarioAtendimentoController {
                                 }
                             }
 
-                            ServiceLocator.getHorarioAtendimentoService().updateList(listaAux);
+                            horarioAtendimentoService.updateList(listaAux);
                         }
 
                     }
@@ -167,7 +178,7 @@ public class HorarioAtendimentoController {
 
         Map<String, Object> criteria = new HashMap<>();
         criteria.put(HorarioAtendimentoCriteria.DIA_ATENDIMENTO_FK_EQ, diaAtendimento.getId());
-        List<HorarioAtendimento> horarioList = ServiceLocator.getHorarioAtendimentoService().readByCriteriaCliente(criteria, null);
+        List<HorarioAtendimento> horarioList = horarioAtendimentoService.readByCriteriaCliente(criteria, null);
 
         //passa o dia do profissional, nao a data apenas
         gerarDias(diaAtendimento, aplicar, aplicarDomingo, aplicarSabado, aplicarFeriados, jsonFeriados, session, horarioList, bloquearReservados);

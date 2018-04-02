@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="t" tagdir="/WEB-INF/tags" %>
 
-<t:wrapper>
+<t:parent>
     <h1>Bem-vindo ${usuarioLogado.nome}</h1>
     <c:if test="${countSolicitacao == 1}">
         <p>Você possui ${countSolicitacao} nova <a href="<c:url value="/solicitacoes?status=aguardando"/>">solicitação</a></p>
@@ -13,4 +13,4 @@
     <c:if test="${countSolicitacao == 0}">
         <p>Você possui ainda não possui nenhuma solicitação</p>
     </c:if>
-</t:wrapper>
+</t:parent>

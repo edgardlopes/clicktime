@@ -5,17 +5,19 @@
  */
 package com.clicktime.web.controller;
 
-import com.clicktime.model.ServiceLocator;
+import com.clicktime.model.base.service.BaseCategoriaServicoService;
+import com.clicktime.model.base.service.BaseServicoService;
 import com.clicktime.model.entity.CategoriaServico;
 import com.clicktime.model.entity.Servico;
 import com.clicktime.model.fields.CategoriaServicoFields;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 
 /*
  * 
@@ -24,18 +26,24 @@ import org.springframework.web.bind.annotation.RequestMethod;
  */
 @Controller
 public class CategoriaServicoController {
+    
+    @Autowired
+    private BaseCategoriaServicoService categoriaServicoService;
+    
+    @Autowired
+    private BaseServicoService servicoService;
 
-    @RequestMapping(value = "/categoria/novo", method = RequestMethod.GET)
+    @GetMapping("/categoria/novo")
     public String create(HttpSession session, Model model) throws Exception {
         return "/categoria/novo";
     }
 
-    @RequestMapping(value = "/categoria/novo", method = RequestMethod.POST)
+    @PostMapping( "/categoria/novo")
     public String create(String nome, Model model) throws Exception {
 
         Map<String, Object> fields = new HashMap<>();
         fields.put(CategoriaServicoFields.NOME, nome);
-        Map<String, String> errors = ServiceLocator.getCategoriaServicoService().validateForCreate(fields);
+        Map<String, String> errors = categoriaServicoService.validateForCreate(fields);
         if (!errors.isEmpty()) {
             model.addAttribute("categoria", fields);
             model.addAttribute("errors", errors);
@@ -44,18 +52,18 @@ public class CategoriaServicoController {
         
         CategoriaServico categoria = new CategoriaServico();
         categoria.setNome(nome);
-        ServiceLocator.getCategoriaServicoService().create(categoria);
+        categoriaServicoService.create(categoria);
 
         return "redirect:/servico/novo";
     }
 
-    @RequestMapping(value = "/tipoServico/novo", method = RequestMethod.GET)
+    @GetMapping("/tipoServico/novo")
     public String createTipoServico(HttpSession session, Model model) throws Exception {
-        model.addAttribute("categorias", ServiceLocator.getCategoriaServicoService().readByCriteria(null, null));
+        model.addAttribute("categorias", categoriaServicoService.readByCriteria(null, null));
         return "/categoria/novo_servico";
     }
 
-    @RequestMapping(value = "/tipoServico/novo", method = RequestMethod.POST)
+    @PostMapping( "/tipoServico/novo")
     public String createTipoServico(Long categoriaFK, String nome, Model model) throws Exception {
 
         Servico servico = new Servico();
@@ -63,7 +71,7 @@ public class CategoriaServicoController {
         CategoriaServico categoriaServico = new CategoriaServico();
         categoriaServico.setId(categoriaFK);
         servico.setCategoria(categoriaServico);
-        ServiceLocator.getServicoService().create(servico);
+        servicoService.create(servico);
 
         return "redirect:/servico/novo";
     }

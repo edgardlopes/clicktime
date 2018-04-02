@@ -1,6 +1,8 @@
 package com.clicktime.web.controller;
 
-import com.clicktime.model.ServiceLocator;
+import com.clicktime.model.base.service.BaseProfissionalService;
+import com.clicktime.model.base.service.BaseSolicitacaoService;
+import com.clicktime.model.base.service.BaseUsuarioService;
 import com.clicktime.model.criteria.SolicitacaoCriteria;
 import com.clicktime.model.entity.Avatar;
 import com.clicktime.model.entity.Profissional;
@@ -18,27 +20,36 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.apache.commons.io.IOUtils;
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 public class UsuarioController {
 
+    @Autowired
+    private BaseProfissionalService profissionalService;
+
+    @Autowired
+    private BaseUsuarioService usuarioService;
+
+    @Autowired
+    private BaseSolicitacaoService solicitacaoService;
+
     //menu de escolha de usuario ao cadastrar...
-    @RequestMapping(value = "/escolha/usuario", method = RequestMethod.GET)
+    @GetMapping("/escolha/usuario")
     public String selectUser(Model m) {
-        m.addAttribute("isIndex", true);
         return "/usuario/escolha-tipo-usuario";
     }
 
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    @PostMapping("/login")
     public String autentica(String email, String senha, HttpSession session, Model m) throws Exception {
         //u.setSenha(DigestUtils.md5Hex(u.getSenha()));
 
-        Usuario usuarioLogado = ServiceLocator.getUsuarioService().login(email, senha);
+        Usuario usuarioLogado = usuarioService.login(email, senha);
 
         if (usuarioLogado != null) {
             setLoggedUser(session, usuarioLogado);
@@ -49,10 +60,8 @@ public class UsuarioController {
     }
 
     //direciona o usuario para a home correta
-    @RequestMapping(value = "/home", method = RequestMethod.GET)
+    @GetMapping("/home")
     public String home(HttpSession session, Model model) {
-
-        model.addAttribute("isHome", true);
 
         Usuario usuarioLogado = getLoggedUser(session);
         if (usuarioLogado instanceof Profissional) {
@@ -64,14 +73,13 @@ public class UsuarioController {
     }
 
     //formulario de cadastro
-    @RequestMapping(value = "/usuario/novo", method = RequestMethod.GET)
+    @GetMapping("/usuario/novo")
     public String create(Model m) {
-        m.addAttribute("isUsuario", true);
         return "/usuario/cadastro-usuario";
     }
 
     //formulario de cadastro POST
-    @RequestMapping(value = "/usuario/novo", method = RequestMethod.POST)
+    @PostMapping("/usuario/novo")
     public String create(Model model, String nome, String sobrenome, String nomeUsuario,
             String email, String telefone, String senha, String senhaConfirm, MultipartFile avatar) throws Exception {
         //usuario.setSenha(DigestUtils.md5Hex(usuario.getSenha()));
@@ -86,7 +94,7 @@ public class UsuarioController {
         fields.put(UsuarioFields.TELEFONE, telefone);
         fields.put(UsuarioFields.SENHA, senha);
         fields.put(UsuarioFields.SENHA_CONFIRM, senhaConfirm);
-        Map<String, String> errors = ServiceLocator.getUsuarioService().validateForCreate(fields);
+        Map<String, String> errors = usuarioService.validateForCreate(fields);
         if (!errors.isEmpty()) {
             model.addAttribute("errors", errors);
             model.addAttribute("usuario", fields);
@@ -100,19 +108,19 @@ public class UsuarioController {
         usuario.setEmail(email);
         usuario.setTelefone(telefone);
         usuario.setSenha(senha);
-        ServiceLocator.getUsuarioService().create(usuario);
+        usuarioService.create(usuario);
 
         if (!avatar.isEmpty()) {
             Avatar a = new Avatar();
             a.setImagem(avatar.getBytes());
-            ServiceLocator.getUsuarioService().setAvatar(usuario.getId(), a);
+            usuarioService.setAvatar(usuario.getId(), a);
         }
 
-        return "redirect:/sucesso";
+        return "redirect:/";
     }
 
     //home cliente
-    @RequestMapping(value = "/usuario/home", method = RequestMethod.GET)
+    @GetMapping("/usuario/home")
     public String home(Model m, HttpSession session) throws Exception {
         Usuario usuario = getLoggedUser(session);
 
@@ -123,37 +131,34 @@ public class UsuarioController {
         criteria.put(SolicitacaoCriteria.DIA_ATENDIMENTO_LE, new DateTime(now.getYear(), now.getMonthOfYear(), now.getDayOfMonth(), 1, 1));
         criteria.put(SolicitacaoCriteria.STATUS_EQ, Solicitacao.SOLICITACAO_ACEITA);
         criteria.put(SolicitacaoCriteria.IS_AVALIACAO, true);
-        List<Solicitacao> solicitacaoList = ServiceLocator.getSolicitacaoService().readByCriteriaSemPaginacao(criteria);
+        List<Solicitacao> solicitacaoList = solicitacaoService.readByCriteriaSemPaginacao(criteria);
         m.addAttribute("avaliacaoCount", solicitacaoList.size());
         return "/usuario/home";
     }
 
-    @RequestMapping(value = "/logout", method = RequestMethod.GET)
+    @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();
-        return "/usuario/usuario-desconectado";
+        return "/error_usuario";
     }
 
-    @RequestMapping(value = "/sucesso", method = RequestMethod.GET)
+    @GetMapping("/sucesso")
     public String sucesso() {
         return "/usuario/sucesso";
     }
 
-    @RequestMapping(value = "/minhaConta", method = RequestMethod.GET)
+    @GetMapping("/minhaConta")
     public String conta(Model model, HttpSession session) throws Exception {
         Usuario usuario = getLoggedUser(session);
         if (usuario instanceof Profissional) {
             model.addAttribute("isProfissional", true);
-        } else {
-            model.addAttribute("isCliente", true);
         }
         model.addAttribute("usuario", usuario);
         model.addAttribute("isUpdate", true);
-        model.addAttribute("minhaConta", "active");
         return "/usuario/update";
     }
 
-    @RequestMapping(value = "/minhaConta", method = RequestMethod.POST)
+    @PostMapping("/minhaConta")
     public String conta(Model model, HttpSession session, String nome, String sobrenome,
             String nomeUsuario, String email, String telefone, String descricao,
             String horaInicio, String horaFim, Long id, MultipartFile avatar) throws Exception {
@@ -173,7 +178,7 @@ public class UsuarioController {
 
         Usuario usuarioLogado = getLoggedUser(session);
         if (usuarioLogado instanceof Profissional) {
-            Map<String, String> errors = ServiceLocator.getProfissionalService().validateForUpdate(fields);
+            Map<String, String> errors = profissionalService.validateForUpdate(fields);
             if (!errors.isEmpty()) {
                 model.addAttribute("errors", errors);
                 model.addAttribute("usuario", fields);
@@ -191,19 +196,19 @@ public class UsuarioController {
             profissional.setDescricao(descricao);
             profissional.setHoraInicio(CalendarioService.parseStringToDateTime(horaInicio, "HH:mm"));
             profissional.setHoraFim(CalendarioService.parseStringToDateTime(horaFim, "HH:mm"));
-            ServiceLocator.getProfissionalService().update(profissional);
+            profissionalService.update(profissional);
             setLoggedUser(session, profissional);
 
             if (!avatar.isEmpty()) {
                 Avatar a = new Avatar();
                 a.setImagem(avatar.getBytes());
-                ServiceLocator.getUsuarioService().setAvatar(profissional.getId(), a);
+                usuarioService.setAvatar(profissional.getId(), a);
             }
 
             return "redirect:/home";
         }
 
-        Map<String, String> errors = ServiceLocator.getUsuarioService().validateForUpdate(fields);
+        Map<String, String> errors = usuarioService.validateForUpdate(fields);
         if (!errors.isEmpty()) {
             model.addAttribute("errors", errors);
             model.addAttribute("usuario", fields);
@@ -216,7 +221,7 @@ public class UsuarioController {
         usuario.setNomeUsuario(nomeUsuario);
         usuario.setEmail(email);
         usuario.setTelefone(telefone);
-        ServiceLocator.getUsuarioService().update(usuario);
+        usuarioService.update(usuario);
         setLoggedUser(session, usuario);
 
         Avatar a = new Avatar();
@@ -227,15 +232,15 @@ public class UsuarioController {
         } else {
             a.setImagem(avatar.getBytes());
         }
-        ServiceLocator.getUsuarioService().setAvatar(usuario.getId(), a);
+        usuarioService.setAvatar(usuario.getId(), a);
 
         return "redirect:/home";
     }
 
-    @RequestMapping(value = "/usuarioLogado/img.jpg", method = RequestMethod.GET)
+    @GetMapping("/usuarioLogado/img.jpg")
     public void streamImagem(HttpSession session, HttpServletResponse response) throws Exception {
         Usuario usuario = getLoggedUser(session);
-        Avatar avatar = ServiceLocator.getUsuarioService().getAvatar(usuario.getId());
+        Avatar avatar = usuarioService.getAvatar(usuario.getId());
         if (avatar != null) {
             response.getOutputStream().write(avatar.getImagem());
         } else {

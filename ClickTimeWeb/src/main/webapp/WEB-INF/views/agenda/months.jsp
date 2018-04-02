@@ -1,12 +1,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@taglib prefix="joda" uri="http://www.joda.org/joda/time/tags" %>
-<%@taglib prefix="t" tagdir="/WEB-INF/tags/" %>
-<%@page import="org.joda.time.DateTime"%>
-<%@page import="org.joda.time.JodaTimePermission"%>
-<jsp:useBean id="now" class="org.joda.time.DateTime" />
+<%@ taglib tagdir="/WEB-INF/tags/" prefix="t" %>
 
 
-<t:wrapper>
+<t:parent>
 
     <c:if test="${not empty profissional}">
         <p>Selecione um mes de atendimento de ${profissional.nome}</p>
@@ -19,5 +15,5 @@
     <c:forEach var="month" items="${months}">
         <div class="col-xs-2"><a role="button" class="btn btn-primary " href="<c:url value="${profissionalURL}/agenda/${year}/${month.value}${complementoURL}"/>">${month}</a></div>
     </c:forEach>
-</t:wrapper>
+</t:parent>
 

@@ -3,11 +3,29 @@
 <%@ taglib prefix="t" tagdir="/WEB-INF/tags/" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 
-<t:wrapper>
+<t:parent>
     <link href="<c:url value="/css/demo.css"/>" rel="stylesheet">
     <link href="<c:url value="/css/calendar.css"/>" rel="stylesheet">
     <link href="<c:url value="/css/custom_1.css"/>" rel="stylesheet">
     <link href="<c:url value="/css/calendario.css"/>" rel="stylesheet">
+    
+    <style>
+        .calendar-wrapper{
+            background-color: #555;
+        }
+        
+        .calendar-header{
+            background-color: #555;
+        }
+        .calendar-header h3{
+            margin: 0;
+            padding: 10px;
+        }
+        
+        .calendar-controls{
+            position: inherit;
+        }
+    </style>
     
     <c:if test="${not empty profissional}">
         <input type="hidden" value="${profissional.id}" id="profissionalID"/>
@@ -17,10 +35,10 @@
         <h3>
             <span>${monthAsString}</span>
             <span>${year}</span>
-            <span class="calendar-controls">
-                <a href="<c:url value="${profissionalURL}/agenda/${previousMonth.year}/${previousMonth.monthOfYear}"/>" class="btn-sm btn-primary" data-toggle="tooltip" data-placement="left" title="${previousMonth.monthOfYear().asText}"><span class="glyphicon glyphicon-triangle-left"></span></a>
-                <a href="<c:url value="${profissionalURL}/agenda/${nextMonth.year}/${nextMonth.monthOfYear}"/>" class="btn-sm btn-primary" data-toggle="tooltip" data-placement="left" title="${nextMonth.monthOfYear().asText}"><span class="glyphicon glyphicon-triangle-right"></span></a>
-                <a href="<c:url value="${profissionalURL}/agenda/${currentMonth.year}/${currentMonth.monthOfYear}"/>" class="btn-sm btn-primary"  data-toggle="tooltip" data-placement="left" title="${currentMonth.monthOfYear().asText}"><span class="glyphicon glyphicon-triangle-bottom"></span></a>
+            <span class="calendar-controls pull-right">
+                <a href="<c:url value="${profissionalURL}/agenda/${previousMonth.year}/${previousMonth.monthOfYear}"/>" class="btn-sm btn-default" data-toggle="tooltip" data-placement="left" title="${previousMonth.monthOfYear().asText}"><span class="glyphicon glyphicon-triangle-left"></span></a>
+                <a href="<c:url value="${profissionalURL}/agenda/${nextMonth.year}/${nextMonth.monthOfYear}"/>" class="btn-sm btn-default" data-toggle="tooltip" data-placement="left" title="${nextMonth.monthOfYear().asText}"><span class="glyphicon glyphicon-triangle-right"></span></a>
+                <a href="<c:url value="${profissionalURL}/agenda/${currentMonth.year}/${currentMonth.monthOfYear}"/>" class="btn-sm btn-default"  data-toggle="tooltip" data-placement="left" title="${currentMonth.monthOfYear().asText}"><span class="glyphicon glyphicon-triangle-bottom"></span></a>
             </span>
         </h3>
     </div>
@@ -51,7 +69,7 @@
             </form>
         </div>
     </c:if>
-</t:wrapper>
+</t:parent>
 
 <script>
     $(document).ready(function () {

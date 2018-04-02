@@ -1,6 +1,9 @@
 package com.clicktime.web.controller;
 
-import com.clicktime.model.ServiceLocator;
+import com.clicktime.model.base.service.BaseCategoriaServicoService;
+import com.clicktime.model.base.service.BaseExecucaoService;
+import com.clicktime.model.base.service.BaseProfissionalService;
+import com.clicktime.model.base.service.BaseServicoService;
 import com.clicktime.model.criteria.ServicoCriteria;
 import com.clicktime.model.entity.CategoriaServico;
 import com.clicktime.model.entity.Execucao;
@@ -13,44 +16,56 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 public class ServicoController {
 
-    @RequestMapping(value = "/servico/getServicos", method = RequestMethod.GET)
+    @Autowired
+    private BaseExecucaoService execucaoService;
+
+    @Autowired
+    private BaseServicoService servicoService;
+
+    @Autowired
+    private BaseCategoriaServicoService categoriaServicoService;
+
+    @Autowired
+    private BaseProfissionalService profissionalService;
+
+    @GetMapping("/servico/getServicos")
     public String readServicos(Model model, String idCategoria) throws Exception {
         Map<String, Object> criteria = new HashMap<>();
         criteria.put(ServicoCriteria.CATEGORIA_SERVICO_FK_EQ, idCategoria);
-        List<Servico> servicos = ServiceLocator.getServicoService().readByCriteria(criteria, null);
+        List<Servico> servicos = servicoService.readByCriteria(criteria, null);
         model.addAttribute("servicos", servicos);
         return "servico/servico-option";
     }
 
-    @RequestMapping(value = "/servicos", method = RequestMethod.GET)
+    @GetMapping("/servicos")
     public String servicos(Model model, HttpSession session) throws Exception {
         final Profissional profissional = (Profissional) getLoggedUser(session);
-        List<Execucao> execucaoList = ServiceLocator.getExecucaoService().readByProfissional(profissional);
+        List<Execucao> execucaoList = execucaoService.readByProfissional(profissional);
         model.addAttribute("execucaoList", execucaoList);
-        model.addAttribute("isServicos", "active");
 
         return "/servico/list";
     }
 
-    @RequestMapping(value = "/servico/novo", method = RequestMethod.GET)
+    @GetMapping("/servico/novo")
     public String create(Model model, HttpSession session) throws Exception {
-        List<CategoriaServico> categorias = ServiceLocator.getCategoriaServicoService().readByCriteria(new HashMap<String, Object>(), null);
+        List<CategoriaServico> categorias = categoriaServicoService.readByCriteria(new HashMap<String, Object>(), null);
         model.addAttribute("categorias", categorias);
         model.addAttribute("isNovoServico", true);
 
         return "/servico/cadastro-servico";
     }
 
-    @RequestMapping(value = "/servico/novo", method = RequestMethod.POST)
+    @PostMapping("/servico/novo")
     public String create(HttpSession session, Model model, String categoriaFK, String servicoFK, String valor, String duracao, String descricao) throws Exception {
         Map<String, Object> fields = new HashMap<>();
         fields.put(ExecucaoServicoFields.CATEGORIA_FK, categoriaFK);
@@ -61,9 +76,9 @@ public class ServicoController {
 
         Profissional profissional = (Profissional) getLoggedUser(session);
         fields.put(ExecucaoServicoFields.PROFISSIONAL, profissional);
-        Map<String, String> errors = ServiceLocator.getExecucaoService().validateForCreate(fields);
+        Map<String, String> errors = execucaoService.validateForCreate(fields);
         if (!errors.isEmpty()) {
-            List<CategoriaServico> categorias = ServiceLocator.getCategoriaServicoService().readByCriteria(new HashMap<String, Object>(), null);
+            List<CategoriaServico> categorias = categoriaServicoService.readByCriteria(new HashMap<String, Object>(), null);
             model.addAttribute("categorias", categorias);
             try {
                 fields.put(ExecucaoServicoFields.DURACAO, CalendarioService.parseStringToDateTime(duracao, "HH:mm"));
@@ -82,28 +97,28 @@ public class ServicoController {
         execucao.setDescricao(descricao);
         execucao.setDuracao(CalendarioService.parseStringToDateTime(duracao, "HH:mm"));
         execucao.setProfissional(profissional);
-        ServiceLocator.getExecucaoService().create(execucao);
+        execucaoService.create(execucao);
 
-        Profissional profissionalAtualizado = ServiceLocator.getProfissionalService().readById(profissional.getId());
+        Profissional profissionalAtualizado = profissionalService.readById(profissional.getId());
         setLoggedUser(session, profissionalAtualizado);
 
         return "redirect:/servico/servicos";
     }
 
-    @RequestMapping(value = "/servico/{id}/excluir", method = RequestMethod.GET)
+    @GetMapping("/servico/{id}/excluir")
     public String delete(@PathVariable Long id, HttpSession session, Model model) throws Exception {
 
         Profissional p = (Profissional) getLoggedUser(session);
-        ServiceLocator.getExecucaoService().delete(id, p);
-        Profissional profissionalAtualizado = ServiceLocator.getProfissionalService().readById(p.getId());
+        execucaoService.delete(id, p);
+        Profissional profissionalAtualizado = profissionalService.readById(p.getId());
         setLoggedUser(session, profissionalAtualizado);
 
         return "redirect:/servico/servicos";
     }
 
-    @RequestMapping(value = "/servico/{id}/editar", method = RequestMethod.GET)
+    @GetMapping("/servico/{id}/editar")
     public String update(@PathVariable Long id, Model model, HttpSession session) throws Exception {
-        Execucao execucao = ServiceLocator.getExecucaoService().readById(id);
+        Execucao execucao = execucaoService.readById(id);
         model.addAttribute("execucao", execucao);
         model.addAttribute("isUpdate", true);
 
@@ -111,9 +126,9 @@ public class ServicoController {
     }
 
     //FALTA VALIDAR!!
-    @RequestMapping(value = "/servico/{id}/editar", method = RequestMethod.POST)
+    @PostMapping("/servico/{id}/editar")
     public String update(@PathVariable Long id, Model model, Execucao execucao) throws Exception {
-        ServiceLocator.getExecucaoService().update(execucao);
+        execucaoService.update(execucao);
         return "redirect:/servico/servicos";
     }
 

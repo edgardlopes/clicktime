@@ -56,8 +56,11 @@
 	</div>
 
 	<ul class="nav nav-pills nav-stacked">
-		<li><a href="<c:url value="/home"/>"><span
-				class="glyphicon glyphicon-home"></span>Home</a></li>
+		<li>
+                    <a href="<c:url value="/home"/>">
+                        <span class="glyphicon glyphicon-home"></span>Home
+                    </a>
+                </li>
 		<!--Menu profissional-->
 		<c:if
 			test="${usuarioLogado['class'].name eq 'com.clicktime.model.entity.Profissional'}">

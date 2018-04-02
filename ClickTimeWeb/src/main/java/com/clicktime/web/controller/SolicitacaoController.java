@@ -1,6 +1,7 @@
 package com.clicktime.web.controller;
 
-import com.clicktime.model.ServiceLocator;
+import com.clicktime.model.base.service.BaseHorarioAtendimentoService;
+import com.clicktime.model.base.service.BaseSolicitacaoService;
 import com.clicktime.model.criteria.SolicitacaoCriteria;
 import com.clicktime.model.dao.SolicitacaoDAO;
 import com.clicktime.model.entity.DiaAtendimento;
@@ -19,29 +20,36 @@ import javax.servlet.http.HttpSession;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 public class SolicitacaoController {
 
-    @RequestMapping(value = "/reservarHorario", method = RequestMethod.POST)
+    @Autowired
+    private BaseHorarioAtendimentoService horarioAtendimentoService;
+
+    @Autowired
+    private BaseSolicitacaoService solicitacaoService;
+
+    @PostMapping("/reservarHorario")
     public String reservarHorario(String execucaoID, String horarioSelecionado, HttpSession session, Model model) throws Exception {
         String[] aux = horarioSelecionado.split(", ");
         final Usuario usuarioLogado = getLoggedUser(session);
 
         Long clienteFK = usuarioLogado.getId();
-        DiaAtendimento dia = ServiceLocator.getHorarioAtendimentoService().readById(Long.parseLong(aux[0])).getDiaAtendimento();
-        HorarioAtendimento horaInicio = ServiceLocator.getHorarioAtendimentoService().readById(Long.parseLong(aux[0]));
-        HorarioAtendimento horaFim = ServiceLocator.getHorarioAtendimentoService().readById(Long.parseLong(aux[aux.length - 1]));
+        DiaAtendimento dia = horarioAtendimentoService.readById(Long.parseLong(aux[0])).getDiaAtendimento();
+        HorarioAtendimento horaInicio = horarioAtendimentoService.readById(Long.parseLong(aux[0]));
+        HorarioAtendimento horaFim = horarioAtendimentoService.readById(Long.parseLong(aux[aux.length - 1]));
 
-        if (ServiceLocator.getSolicitacaoService().existsSolicitacao(Long.parseLong(execucaoID), clienteFK, dia.getId(), horaInicio.getHoraInicio(), horaFim.getHoraFim())) {
+        if (solicitacaoService.existsSolicitacao(Long.parseLong(execucaoID), clienteFK, dia.getId(), horaInicio.getHoraInicio(), horaFim.getHoraFim())) {
             return "/solicitacao/ja-reservada";
         }
-        
+
         List<HorarioAtendimento> horarioAtendimentoList = new ArrayList<>();
 
         for (String id : aux) {
@@ -59,14 +67,14 @@ public class SolicitacaoController {
 
         solicitacao.setUsuario(usuarioLogado);
 
-        ServiceLocator.getSolicitacaoService().solicitarHorario(solicitacao);
-        solicitacao = ServiceLocator.getSolicitacaoService().readById(solicitacao.getId());
+        solicitacaoService.solicitarHorario(solicitacao);
+        solicitacao = solicitacaoService.readById(solicitacao.getId());
         model.addAttribute("solicitacao", solicitacao);
 
         return "/solicitacao/cliente/sucesso";
     }
 
-    @RequestMapping(value = "/solicitacoes", method = RequestMethod.GET)
+    @GetMapping("/solicitacoes")
     public String list(HttpSession session, Model model, String dataInicio, String dataFim, String status, Integer pagina) throws Exception {
         if (pagina == null) {
             pagina = 1;
@@ -112,28 +120,27 @@ public class SolicitacaoController {
         }
 
         Usuario usuario = getLoggedUser(session);
-                
-        criteria.put(usuario instanceof Profissional ? 
-                SolicitacaoCriteria.PROFISSIONAL_FK_EQ : SolicitacaoCriteria.CLIENTE_FK_EQ, usuario.getId());
-        
-        List<Solicitacao> solicitacaoList = ServiceLocator.getSolicitacaoService().readByCriteria(criteria, (pagina - 1) * SolicitacaoDAO.LIMIT);
-        Long count = ServiceLocator.getSolicitacaoService().countByCriteria(criteria);
+
+        criteria.put(usuario instanceof Profissional
+                ? SolicitacaoCriteria.PROFISSIONAL_FK_EQ : SolicitacaoCriteria.CLIENTE_FK_EQ, usuario.getId());
+
+        List<Solicitacao> solicitacaoList = solicitacaoService.readByCriteria(criteria, (pagina - 1) * SolicitacaoDAO.LIMIT);
+        Long count = solicitacaoService.countByCriteria(criteria);
         Integer paginas = Math.round(count.floatValue() / SolicitacaoDAO.LIMIT.floatValue());
         model.addAttribute("solicitacaoList", solicitacaoList);
         model.addAttribute("pagina", pagina);
         model.addAttribute("countPaginas", paginas);
 
-        model.addAttribute("solicitacao", "active");
 
-        return usuario instanceof Profissional ? 
-                "/solicitacao/profissional/list" : "/solicitacao/cliente/list";
+        return usuario instanceof Profissional
+                ? "/solicitacao/profissional/list" : "/solicitacao/cliente/list";
     }
 
-    @RequestMapping(value = "/solicitacao/{id}/aceitar", method = RequestMethod.GET)
+    @GetMapping("/solicitacao/{id}/aceitar")
     public String aceitarSolicitacao(HttpSession session, @PathVariable Long id, Model m) throws Exception {
         Solicitacao solicitacao = new Solicitacao();
         solicitacao.setId(id);
-        List<Solicitacao> solicitacoesCanceladas = ServiceLocator.getSolicitacaoService().aceitarHorario(solicitacao);
+        List<Solicitacao> solicitacoesCanceladas = solicitacaoService.aceitarHorario(solicitacao);
         if (solicitacoesCanceladas.isEmpty()) {
             return "redirect:/solicitacoes";
         }
@@ -142,10 +149,10 @@ public class SolicitacaoController {
         return "/solicitacao/profissional/solicitacao_cancelada_list";
     }
 
-    @RequestMapping(value = "/solicitacao/rejeitar", method = RequestMethod.POST)
+    @PostMapping("/solicitacao/rejeitar")
     public String rejeitarSolicitacao(Long solicitacaoID, String idList, String descricao) throws Exception {
         //adicionar justificativa 
-        Solicitacao solicitacao = ServiceLocator.getSolicitacaoService().readById(solicitacaoID);
+        Solicitacao solicitacao = solicitacaoService.readById(solicitacaoID);
         if (idList != null && !idList.isEmpty()) {
             String[] aux = idList.split(", ");
             List<HorarioAtendimento> horarioAtendimentoList = new ArrayList<>();
@@ -160,14 +167,14 @@ public class SolicitacaoController {
             solicitacao.setHorarioAtendimentoList(horarioAtendimentoList);
             solicitacao.setDescricao(descricao);
             solicitacao.setStatus(Solicitacao.SOLICITACAO_REMARCADA);
-            ServiceLocator.getSolicitacaoService().remarcarSolicitacao(solicitacao);
+            solicitacaoService.remarcarSolicitacao(solicitacao);
         } else {
-            ServiceLocator.getSolicitacaoService().recusarHorario(solicitacao);
+            solicitacaoService.recusarHorario(solicitacao);
         }
         return "redirect:/solicitacoes";
     }
 
-    @RequestMapping(value = "/solicitacao/remarcar", method = RequestMethod.POST)
+    @PostMapping("/solicitacao/remarcar")
     public void remarcar(HttpServletResponse response, Long solicitacaoID, String horarioAtendimentoID, String descricao) {
         try {
             String[] aux = horarioAtendimentoID.split(", ");
@@ -186,7 +193,7 @@ public class SolicitacaoController {
             solicitacao.setDescricao(descricao);
             solicitacao.setStatus(Solicitacao.SOLICITACAO_REMARCADA);
 
-            ServiceLocator.getSolicitacaoService().remarcarSolicitacao(solicitacao);
+            solicitacaoService.remarcarSolicitacao(solicitacao);
             response.setStatus(200);
         } catch (Exception exception) {
             exception.printStackTrace();
@@ -194,29 +201,29 @@ public class SolicitacaoController {
         }
     }
 
-    @RequestMapping(value = "/solicitacao/{id}/aceitarNovo", method = RequestMethod.GET)
+    @GetMapping("/solicitacao/{id}/aceitarNovo")
     public String aceitarNovo(@PathVariable Long id) throws Exception {
-        Solicitacao solicitacao = ServiceLocator.getSolicitacaoService().readById(id);
-        ServiceLocator.getSolicitacaoService().aceitarHorario(solicitacao);
+        Solicitacao solicitacao = solicitacaoService.readById(id);
+        solicitacaoService.aceitarHorario(solicitacao);
 
         return "redirect:/solicitacoes";
     }
 
-    @RequestMapping(value = "/solicitacao/{id}/recusarNovo", method = RequestMethod.GET)
+    @GetMapping("/solicitacao/{id}/recusarNovo")
     public String recusarNovo(@PathVariable Long id) throws Exception {
-        Solicitacao solicitacao = ServiceLocator.getSolicitacaoService().readById(id);
-        ServiceLocator.getSolicitacaoService().recusarHorario(solicitacao);
+        Solicitacao solicitacao = solicitacaoService.readById(id);
+        solicitacaoService.recusarHorario(solicitacao);
         return "redirect:/solicitacoes";
     }
 
-    @RequestMapping(value = "/horarioatendimento/solicitacao", method = RequestMethod.GET)
+    @GetMapping("/horarioatendimento/solicitacao")
     public String getSolicitacaoFromHorarioAtendimento(Long horarioAtendimentoID, Model model, String status) throws Exception {
-        Solicitacao solicitacao = ServiceLocator.getSolicitacaoService().getSolicitacaoFromHorarioAtendimentoId(horarioAtendimentoID, status);
+        Solicitacao solicitacao = solicitacaoService.getSolicitacaoFromHorarioAtendimentoId(horarioAtendimentoID, status);
         model.addAttribute("solicitacao", solicitacao);
         return "/agenda/profissional/solicitacao-resumo";
     }
 
-    @RequestMapping(value = "/avaliacoes", method = RequestMethod.GET)
+    @GetMapping("/avaliacoes")
     public String getAvaliacoes(Model model, HttpSession session) throws Exception {
         Map<String, Object> criteria = new HashMap<>();
         Usuario usuario = getLoggedUser(session);
@@ -228,20 +235,19 @@ public class SolicitacaoController {
         criteria.put(SolicitacaoCriteria.STATUS_EQ, Solicitacao.SOLICITACAO_ACEITA);
         criteria.put(SolicitacaoCriteria.IS_AVALIACAO, true);
 
-        List<Solicitacao> solicitacaoList = ServiceLocator.getSolicitacaoService().readByCriteriaSemPaginacao(criteria);
+        List<Solicitacao> solicitacaoList = solicitacaoService.readByCriteriaSemPaginacao(criteria);
 
         model.addAttribute("solicitacaoList", solicitacaoList);
         model.addAttribute("isAvaliacao", true);
 
-        model.addAttribute("avaliacao", "active");
         return "/solicitacao/cliente/list";
     }
 
-    @RequestMapping(value = "/avaliarSolicitacao", method = RequestMethod.POST)
+    @PostMapping("/avaliarSolicitacao")
     public void avaliar(Long solicitacaoID, Float score, HttpServletResponse response) {
 
         try {
-            ServiceLocator.getSolicitacaoService().avaliar(solicitacaoID, score);
+            solicitacaoService.avaliar(solicitacaoID, score);
             response.setStatus(200);
         } catch (Exception e) {
             e.printStackTrace();
